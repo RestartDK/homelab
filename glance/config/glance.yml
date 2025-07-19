@@ -1,0 +1,110 @@
+server:
+  proxied: true
+  port: ${GLANCE_PORT}
+  assets-path: /app/assets
+auth:
+  secret-key: ${GLANCE_SECRET}
+  users:
+    daniel:
+      password: ${GLANCE_DANIEL_PASSWORD}
+theme:
+  disable-picker: false
+  presets:
+    kanso-zen:
+      background-color: 210 36 5 
+      primary-color: 150 4 78 
+      positive-color: 91 13 54 
+      negative-color: 353 70 65 
+      accent-color: 199 19 62 
+    
+    kanso-pearl:
+      light: true
+      background-color: 40 10 94 
+      primary-color: 218 14 15 
+      positive-color: 86 27 42 
+      negative-color: 352 55 52 
+      accent-color: 218 34 45 
+    
+    kanso-mist:
+      background-color: 222 13 16 
+      primary-color: 150 4 78 
+      positive-color: 91 13 54 
+      negative-color: 353 70 65 
+      accent-color: 199 19 62 
+    
+    kanso-ink:
+      background-color: 220 18 10 
+      primary-color: 150 4 78 
+      positive-color: 91 13 54 
+      negative-color: 353 70 65 
+      accent-color: 199 19 62 
+pages:
+  - name: Home
+    columns:
+      - size: small
+        widgets:
+          - type: calendar
+            first-day-of-week: monday
+
+          # - type: rss
+          #   limit: 10
+          #   collapse-after: 3
+          #   cache: 12h
+          #   feeds:
+          #     - url: https://selfh.st/rss/
+          #       title: selfh.st
+          #       limit: 4
+          #     - url: https://ciechanow.ski/atom.xml
+          #     - url: https://www.joshwcomeau.com/rss.xml
+          #       title: Josh Comeau
+          #     - url: https://samwho.dev/rss.xml
+          #     - url: https://ishadeed.com/feed.xml
+          #       title: Ahmad Shadeed
+
+      - size: full
+        widgets:
+          - type: group
+            widgets:
+              - type: hacker-news
+              - type: lobsters
+
+          - type: videos
+            channels:
+              - UCbRP3c757lWg9M-U7TyEkXA # Theo browne
+              - UCcefcZRL2oaA_uBNeo5UOWg # Y combinator
+              - UCsBjURrPoezykLs9EqgamOA # Fireship
+              - UCBJycsmduvYEL83R_U4JriQ # Marques Brownlee
+
+      - size: small
+        widgets:
+          - type: weather
+            location: Madrid, Spain
+            units: metric
+            hour-format: 24h # alternatively "24h"
+
+          - type: monitor
+            cache: 1m
+            title: Services
+            sites:
+              - title: JellyFin
+                url: http://media.localhost
+                icon: /assets/jellyfin.svg
+              - title: Jellyseerr
+                url: http://media-request.localhost
+                icon: /assets/jellyseerr.svg
+              - title: Komga
+                url: http://library.localhost
+                icon: /assets/komga.svg
+              - title: Cockpit
+                url: http://admin.localhost
+                icon: /assets/cockpit.svg
+
+              # - title: JellyFin
+              #   url: https://media.${SERVER_URL}.com
+              #   icon: /assets/jellyfin.svg
+              # - title: Komga
+              #   url: https://library.${SERVER_URL}.com
+              #   icon: /assets/komga.svg
+              # - title: Cockpit
+              #   url: https://admin.${SERVER_URL}.com
+              #   icon: /assets/cockpit.svg

@@ -1,0 +1,83 @@
+name: homelab
+services:
+  caddy:
+    container_name: caddy
+    image: restartdk/caddy-cloudflare:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - $PWD/Caddyfile:/etc/caddy/Caddyfile
+      - ${CERTIFICATES_PATH}:/data
+      - ${CADDY_PATH}/config:/config
+    environment:
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+
+  glance:
+    image: glanceapp/glance
+    container_name: glance
+    restart: unless-stopped
+    env_file:
+      - .env 
+    volumes:
+      - ${GLANCE_PATH}/config:/app/config
+      - ${ASSETS_PATH}:/app/assets
+    ports:
+      - 8080:${GLANCE_PORT}
+    expose:
+      - ${GLANCE_PORT}
+    environment:
+      - GLANCE_PORT=${GLANCE_PORT}
+      - GLANCE_SECRET=${GLANCE_SECRET}
+      - GLANCE_DANIEL_PASSWORD=${GLANCE_DANIEL_PASSWORD}
+      - SERVER_URL=${SERVER_URL}
+
+  komga:
+    image: gotson/komga
+    container_name: komga
+    restart: unless-stopped
+    env_file:
+      - .env 
+    user: ${USER_UID}:${USER_GUID}
+    volumes:
+      - ${KOMGA_PATH}/config:/config
+      - ${BOOKS_PATH}:/data
+      - /etc/timezone:/etc/timezone
+    ports:
+      - 25600:${KOMGA_PORT}
+    expose:
+      - ${KOMGA_PORT}
+
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    restart: "unless-stopped"
+    env_file:
+      - .env 
+    user: ${USER_UID}:${USER_GUID}
+    volumes:
+      - ${JELLYFIN_PATH}/config:/config
+      - ${JELLYFIN_PATH}/cache:/cache
+      - ${MEDIA_PATH}:/media
+    ports:
+      - 8096:${JELLYFIN_PORT}
+    expose:
+      - ${JELLYFIN_PORT}
+    environment:
+      - JELLYFIN_PublishedServerUrl=${SERVER_URL}
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr
+    container_name: jellyseerr
+    restart: unless-stopped
+    env_file:
+      - .env 
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=Europe/Paris
+      - PORT=${JELLYSEERR_PORT} 
+    ports:
+      - 5055:${JELLYSEERR_PORT}
+    volumes:
+      - ${JELLYSEERR_PATH}/config:/app/config

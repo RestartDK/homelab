@@ -1,0 +1,8 @@
+---
+description: Guidlines to compatible home server code generation
+alwaysApply: false
+---
+
+The home server that is being used is Fedora 42 Server edition.
+
+I also have cockpit for admin utils of the server

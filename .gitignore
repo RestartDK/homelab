@@ -1,0 +1,91 @@
+# Environment files (exclude all .env files except examples)
+.env*
+!.env.example
+
+# Docker volumes and data
+data/certificates/*
+data/media/*
+data/books/*
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Application specific data
+jellyfin/config/*
+jellyfin/cache/*
+komga/config/*
+jellyseerr/config/*
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Docker
+.dockerignore
+
+# Node modules (if any frontend components)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python (if any scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache directories
+cache/*
+
+# Generated certificates
+*.pem
+*.key
+*.crt
+*.csr
+
+# Sensitive configuration
+config/secrets/
+secrets/
+*.key
+*.pem
+*.crt
+
+# Other
+.todo

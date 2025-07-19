@@ -1,0 +1,81 @@
+# Glance dashboard
+dashboard.{env.DOMAIN} {
+	reverse_proxy glance:{env.GLANCE_PORT} {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+		resolvers 1.1.1.1
+	}
+}
+
+# Komga service
+library.{env.DOMAIN} {
+	reverse_proxy komga:{env.KOMGA_PORT} {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+		resolvers 1.1.1.1
+	}
+}
+
+# Jellyfin service
+media.{env.DOMAIN} {
+	reverse_proxy jellyfin:{env.JELLYFIN_PORT} {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+		resolvers 1.1.1.1
+	}
+}
+
+# Jellyseerr service
+media-request.{env.DOMAIN} {
+	reverse_proxy jellyseerr:{env.JELLYSEERR_PORT} {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+		resolvers 1.1.1.1
+	}
+}
+
+# Cockpit (proxy to host)
+admin.{env.DOMAIN} {
+	reverse_proxy https://{env.SERVER_IP}:{env.COCKPIT_PORT} {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+		resolvers 1.1.1.1
+	}
+}
+
+# Local testing - no TLS needed for localhost
+# dashboard.localhost {
+# 	reverse_proxy glance:8080
+# }
+
+# library.localhost {
+# 	reverse_proxy komga:25600
+# }
+
+# media.localhost {
+# 	reverse_proxy jellyfin:8096
+# }
+
+# media-request.localhost {
+# 	reverse_proxy jellyseerr:5055
+# }
