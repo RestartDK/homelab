@@ -1,0 +1,2 @@
+# This file ensures the jellyfin config directory is tracked in git
+# Jellyfin configuration and metadata will be stored here 

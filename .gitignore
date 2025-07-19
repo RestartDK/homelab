@@ -4,8 +4,11 @@
 
 # Docker volumes and data
 data/certificates/*
+!data/certificates/.gitkeep
 data/media/*
+!data/media/.gitkeep
 data/books/*
+!data/books/.gitkeep
 
 # Logs
 *.log
@@ -14,9 +17,15 @@ logs/
 
 # Application specific data
 jellyfin/config/*
+!jellyfin/config/.gitkeep
 jellyfin/cache/*
+!jellyfin/cache/.gitkeep
 komga/config/*
+!komga/config/.gitkeep
 jellyseerr/config/*
+!jellyseerr/config/.gitkeep
+glance/config/*
+!glance/config/.gitkeep
 
 # Temporary files
 *.tmp
@@ -73,6 +82,7 @@ venv.bak/
 
 # Cache directories
 cache/*
+!cache/.gitkeep
 
 # Generated certificates
 *.pem
