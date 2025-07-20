@@ -7,10 +7,12 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    env_file:
+      - .env 
     volumes:
-      - $PWD/Caddyfile:/etc/caddy/Caddyfile
-      - ${CERTIFICATES_PATH}:/data
-      - ${CADDY_PATH}/config:/config
+      - $PWD/Caddyfile:/etc/caddy/Caddyfile:Z
+      - ${CERTIFICATES_PATH}:/data:Z
+      - ${CADDY_PATH}/config:/config:Z
     environment:
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
 
@@ -21,8 +23,8 @@ services:
     env_file:
       - .env 
     volumes:
-      - ${GLANCE_PATH}/config:/app/config
-      - ${ASSETS_PATH}:/app/assets
+      - ${GLANCE_PATH}/config:/app/config:Z
+      - ${ASSETS_PATH}:/app/assets:Z
     ports:
       - 8080:${GLANCE_PORT}
     environment:
@@ -37,11 +39,9 @@ services:
     restart: unless-stopped
     env_file:
       - .env 
-    user: ${USER_UID}:${USER_GUID}
     volumes:
-      - ${KOMGA_PATH}/config:/config
-      - ${BOOKS_PATH}:/data
-      - /etc/timezone:/etc/timezone
+      - ${KOMGA_PATH}/config:/config:Z
+      - ${BOOKS_PATH}:/data:Z
     ports:
       - 25600:${KOMGA_PORT}
 
@@ -51,11 +51,10 @@ services:
     restart: "unless-stopped"
     env_file:
       - .env 
-    user: ${USER_UID}:${USER_GUID}
     volumes:
-      - ${JELLYFIN_PATH}/config:/config
-      - ${JELLYFIN_PATH}/cache:/cache
-      - ${MEDIA_PATH}:/media
+      - ${JELLYFIN_PATH}/config:/config:Z
+      - ${JELLYFIN_PATH}/cache:/cache:Z
+      - ${MEDIA_PATH}:/media:Z
     ports:
       - 8096:${JELLYFIN_PORT}
     environment:
@@ -74,4 +73,4 @@ services:
     ports:
       - 5055:${JELLYSEERR_PORT}
     volumes:
-      - ${JELLYSEERR_PATH}/config:/app/config
+      - ${JELLYSEERR_PATH}/config:/app/config:Z
