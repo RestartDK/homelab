@@ -87,24 +87,11 @@ pages:
             title: Services
             sites:
               - title: JellyFin
-                url: http://media.localhost
+                url: https://media.${DOMAIN}
                 icon: /assets/jellyfin.svg
-              - title: Jellyseerr
-                url: http://media-request.localhost
-                icon: /assets/jellyseerr.svg
               - title: Komga
-                url: http://library.localhost
+                url: https://library.${DOMAIN}
                 icon: /assets/komga.svg
               - title: Cockpit
-                url: http://admin.localhost
+                url: https://admin.${DOMAIN}
                 icon: /assets/cockpit.svg
-
-              # - title: JellyFin
-              #   url: https://media.${SERVER_URL}.com
-              #   icon: /assets/jellyfin.svg
-              # - title: Komga
-              #   url: https://library.${SERVER_URL}.com
-              #   icon: /assets/komga.svg
-              # - title: Cockpit
-              #   url: https://admin.${SERVER_URL}.com
-              #   icon: /assets/cockpit.svg
