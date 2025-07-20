@@ -52,8 +52,9 @@ media-request.{env.DOMAIN} {
 
 # Cockpit (proxy to host)
 admin.{env.DOMAIN} {
-	reverse_proxy https://{env.SERVER_IP}:{env.COCKPIT_PORT} {
+	reverse_proxy {env.SERVER_IP}:{env.COCKPIT_PORT} {
 		transport http {
+			tls
 			tls_insecure_skip_verify
 		}
 	}
