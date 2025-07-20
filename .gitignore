@@ -9,6 +9,8 @@ data/media/*
 !data/media/.gitkeep
 data/books/*
 !data/books/.gitkeep
+data/tailscale/*
+!data/tailscale/.gitkeep
 
 # Logs
 *.log

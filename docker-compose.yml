@@ -15,6 +15,38 @@ services:
       - ${CADDY_PATH}/config:/config:Z
     environment:
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+    
+  tailscale:
+      image: "tailscale/tailscale:latest"
+      container_name: tailscale
+      hostname: ${TAILSCALE_NAME}
+      restart: unless-stopped
+      env_file:
+        - .env
+      cap_add:
+        - NET_ADMIN
+        - NET_RAW
+      environment:
+        # location of the state directory of tailscale daemon - needs to be persisted between restarts
+        - TS_STATE_DIR=/var/lib/tailscale
+        - TS_AUTHKEY=${TAILSCALE_AUTHKEY}
+        - TS_EXTRA_ARGS=--advertise-exit-node --advertise-routes=${LOCAL_ROUTES}
+      volumes:
+        # the named volume created in the 'volumes' section below
+        - tailscale_data:/var/lib
+        - /dev/net/tun:/dev/net/tun
+      healthcheck:
+        test: ["CMD-SHELL", "tailscale status --peers=false --json | grep -q 'Online.*true'"]
+        interval: 1m30s
+        timeout: 10s
+        retries: 3
+        start_period: 40s
+      labels:
+        kuma.networking.group.name: "networking"
+        kuma.tailscale.docker.parent_name: "networking"
+        kuma.tailscale.docker.name: "tailscale"
+        kuma.tailscale.docker.docker_container: "tailscale"
+        kuma.tailscale.docker.docker_host: 1
 
   glance:
     image: glanceapp/glance
@@ -74,3 +106,11 @@ services:
       - 5055:${JELLYSEERR_PORT}
     volumes:
       - ${JELLYSEERR_PATH}/config:/app/config:Z
+
+volumes:
+  tailscale_data:     
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${TAILSCALE_DATA_PATH}
