@@ -15,8 +15,8 @@ services:
       - .env 
     volumes:
       - $PWD/Caddyfile:/etc/caddy/Caddyfile:Z   
-      - caddy_data:/data                       
-      - caddy_config:/config                   
+      - caddy_data:/data:Z                       
+      - caddy_config:/config:Z                   
     environment:
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
       - DOMAIN=${DOMAIN}
@@ -37,12 +37,13 @@ services:
     env_file:
       - .env 
     volumes:
-      - ${GLANCE_PATH}/config:/app/config
-      - ${ASSETS_PATH}:/app/assets
+      - ${GLANCE_PATH}/config:/app/config:Z
+      - ${ASSETS_PATH}:/app/assets:Z
     ports:
       - 8080:${GLANCE_PORT}
     environment:
       - GLANCE_PORT=${GLANCE_PORT}
+      - TAILSCALE_API_KEY=${TAILSCALE_API_KEY}
       - GLANCE_SECRET=${GLANCE_SECRET}
       - GLANCE_DANIEL_PASSWORD=${GLANCE_DANIEL_PASSWORD}
       - SERVER_URL=${SERVER_URL}
@@ -56,7 +57,7 @@ services:
     env_file:
       - .env 
     volumes:
-      - komga_config:/config                     
+      - komga_config:/config:Z                     
       - ${BOOKS_PATH}:/data:Z                    
     ports:
       - 25600:${KOMGA_PORT}
@@ -85,8 +86,8 @@ services:
     env_file:
       - .env 
     volumes:
-      - jellyfin_config:/config                  
-      - jellyfin_cache:/cache                    
+      - jellyfin_config:/config:Z                  
+      - jellyfin_cache:/cache:Z                    
       - ${MEDIA_PATH}:/media:Z                   
     ports:
       - 8096:${JELLYFIN_PORT}
@@ -106,7 +107,7 @@ services:
     ports:
       - 5055:${JELLYSEERR_PORT}
     volumes:
-      - jellyseerr_config:/app/config            
+      - jellyseerr_config:/app/config:Z            
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
       start_period: 20s
@@ -123,10 +124,10 @@ services:
     environment:
       - TZ=Europe/Paris
     volumes:
-      - radarr_config:/config                    
+      - radarr_config:/config:Z                    
       - ${DATA_PATH}:/data:Z                     
     ports:
-      - 7878:7878
+      - 7878:${RADARR_PORT}
 
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
@@ -137,10 +138,23 @@ services:
     environment:
       - TZ=Europe/Paris
     volumes:
-      - sonarr_config:/config                    
+      - sonarr_config:/config:Z                    
       - ${DATA_PATH}:/data:Z                     
     ports:
-      - 8989:8989
+      - 8989:${SONARR_PORT}
+  
+  prowlarr:
+      image: lscr.io/linuxserver/prowlarr:latest
+      container_name: prowlarr
+      restart: unless-stopped
+      networks:
+        - caddynet
+      environment:
+        - TZ=Europe/Paris
+      volumes:
+        - prowlarr_config:/config:Z
+      ports:
+        - 9696:${PROWLARR_PORT}
 
 networks:
   caddynet:
@@ -157,3 +171,4 @@ volumes:
   jellyseerr_config:
   radarr_config:
   sonarr_config:
+  prowlarr_config:
