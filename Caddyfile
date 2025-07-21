@@ -1,10 +1,6 @@
 # Glance dashboard
 dashboard.{env.DOMAIN} {
-	reverse_proxy glance:{env.GLANCE_PORT} {
-		transport http {
-			tls_insecure_skip_verify
-		}
-	}
+	reverse_proxy glance:{env.GLANCE_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 		resolvers 1.1.1.1
@@ -13,11 +9,7 @@ dashboard.{env.DOMAIN} {
 
 # Komga service
 library.{env.DOMAIN} {
-	reverse_proxy komga:{env.KOMGA_PORT} {
-		transport http {
-			tls_insecure_skip_verify
-		}
-	}
+	reverse_proxy komga:{env.KOMGA_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 		resolvers 1.1.1.1
@@ -26,11 +18,7 @@ library.{env.DOMAIN} {
 
 # Jellyfin service
 media.{env.DOMAIN} {
-	reverse_proxy jellyfin:{env.JELLYFIN_PORT} {
-		transport http {
-			tls_insecure_skip_verify
-		}
-	}
+	reverse_proxy jellyfin:{env.JELLYFIN_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 		resolvers 1.1.1.1
@@ -39,11 +27,34 @@ media.{env.DOMAIN} {
 
 # Jellyseerr service
 media-request.{env.DOMAIN} {
-	reverse_proxy jellyseerr:{env.JELLYSEERR_PORT} {
-		transport http {
-			tls_insecure_skip_verify
-		}
+	reverse_proxy jellyseerr:{env.JELLYSEERR_PORT}
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+		resolvers 1.1.1.1
 	}
+}
+
+# Radarr service
+radarr.{env.DOMAIN} {
+	reverse_proxy radarr:{env.RADARR_PORT}
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+		resolvers 1.1.1.1
+	}
+}
+
+# Sonarr service
+sonarr.{env.DOMAIN} {
+	reverse_proxy sonarr:{env.SONARR_PORT}
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+		resolvers 1.1.1.1
+	}
+}
+
+# Suwayomi service
+manga.{env.DOMAIN} {
+	reverse_proxy suwayomi:{env.SUWAYOMI_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 		resolvers 1.1.1.1
@@ -52,7 +63,7 @@ media-request.{env.DOMAIN} {
 
 # Cockpit (proxy to host)
 admin.{env.DOMAIN} {
-	reverse_proxy {env.SERVER_IP}:{env.COCKPIT_PORT} {
+	reverse_proxy host.docker.internal:{env.COCKPIT_PORT} {
 		transport http {
 			tls
 			tls_insecure_skip_verify
@@ -63,20 +74,3 @@ admin.{env.DOMAIN} {
 		resolvers 1.1.1.1
 	}
 }
-
-# Local testing - no TLS needed for localhost
-# dashboard.localhost {
-# 	reverse_proxy glance:8080
-# }
-
-# library.localhost {
-# 	reverse_proxy komga:25600
-# }
-
-# media.localhost {
-# 	reverse_proxy jellyfin:8096
-# }
-
-# media-request.localhost {
-# 	reverse_proxy jellyseerr:5055
-# }

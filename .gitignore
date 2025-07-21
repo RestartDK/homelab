@@ -29,6 +29,10 @@ jellyseerr/config/*
 !jellyseerr/config/.gitkeep
 glance/config/*
 !glance/config/.gitkeep
+radarr/config/*
+!radarr/config/.gitkeep
+sonarr/config/*
+!sonarr/config/.gitkeep
 
 # Temporary files
 *.tmp

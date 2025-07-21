@@ -86,12 +86,24 @@ pages:
             cache: 1m
             title: Services
             sites:
-              - title: JellyFin
+              - title: Jellyfin
                 url: https://media.${DOMAIN}
                 icon: /assets/jellyfin.svg
+              - title: Jellyseerr
+                url: https://media-request.${DOMAIN}
+                icon: /assets/jellyseerr.svg
               - title: Komga
                 url: https://library.${DOMAIN}
                 icon: /assets/komga.svg
+              - title: Radarr
+                url: https://radarr.${DOMAIN}
+                icon: /assets/radarr.svg
+              - title: Sonarr
+                url: https://sonarr.${DOMAIN}
+                icon: /assets/sonarr.svg
+              - title: Tachidesk
+                url: https://manga.${DOMAIN}
+                icon: /assets/suwayomi.svg
               - title: Cockpit
                 url: https://admin.${DOMAIN}
                 icon: /assets/cockpit.svg

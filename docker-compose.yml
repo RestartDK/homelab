@@ -2,11 +2,15 @@ name: homelab
 services:
   caddy:
     container_name: caddy
+    hostname: caddy
     image: restartdk/caddy-cloudflare:latest
     restart: unless-stopped
+    networks:
+      - caddynet
     ports:
       - "80:80"
       - "443:443"
+      - "443:443/udp"
     env_file:
       - .env 
     volumes:
@@ -15,25 +19,34 @@ services:
       - ${CADDY_PATH}/config:/config:Z
     environment:
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - DOMAIN=${DOMAIN}
+      - GLANCE_PORT=${GLANCE_PORT}
+      - KOMGA_PORT=${KOMGA_PORT}
+      - JELLYFIN_PORT=${JELLYFIN_PORT}
+      - JELLYSEERR_PORT=${JELLYSEERR_PORT}
+      - SERVER_IP=${SERVER_IP}
+      - COCKPIT_PORT=${COCKPIT_PORT}
+    extra_hosts:
+         - host.docker.internal:host-gateway
     
   tailscale:
       image: "tailscale/tailscale:latest"
       container_name: tailscale
       hostname: ${TAILSCALE_NAME}
       restart: unless-stopped
+      network_mode: host
       env_file:
         - .env
       cap_add:
-        - NET_ADMIN
-        - NET_RAW
+      - NET_ADMIN
+      - SYS_MODULE
       environment:
         # location of the state directory of tailscale daemon - needs to be persisted between restarts
         - TS_STATE_DIR=/var/lib/tailscale
         - TS_AUTHKEY=${TAILSCALE_AUTHKEY}
         - TS_EXTRA_ARGS=--advertise-exit-node --advertise-routes=${LOCAL_ROUTES}
       volumes:
-        # the named volume created in the 'volumes' section below
-        - tailscale_data:/var/lib
+        - ${TAILSCALE_DATA_PATH}:/var/lib/tailscale:Z
         - /dev/net/tun:/dev/net/tun
       healthcheck:
         test: ["CMD-SHELL", "tailscale status --peers=false --json | grep -q 'Online.*true'"]
@@ -41,17 +54,13 @@ services:
         timeout: 10s
         retries: 3
         start_period: 40s
-      labels:
-        kuma.networking.group.name: "networking"
-        kuma.tailscale.docker.parent_name: "networking"
-        kuma.tailscale.docker.name: "tailscale"
-        kuma.tailscale.docker.docker_container: "tailscale"
-        kuma.tailscale.docker.docker_host: 1
 
   glance:
     image: glanceapp/glance
     container_name: glance
     restart: unless-stopped
+    networks:
+      - caddynet
     env_file:
       - .env 
     volumes:
@@ -69,6 +78,8 @@ services:
     image: gotson/komga
     container_name: komga
     restart: unless-stopped
+    networks:
+      - caddynet
     env_file:
       - .env 
     volumes:
@@ -77,10 +88,27 @@ services:
     ports:
       - 25600:${KOMGA_PORT}
 
+  suwayomi:
+    image: ghcr.io/suwayomi/suwayomi-server:stable
+    container_name: suwayomi
+    restart: unless-stopped
+    networks:
+      - caddynet
+    env_file:
+      - .env
+    environment:
+      - TZ=Europe/Paris
+    volumes:
+      - ${MANGA_PATH}:/home/suwayomi/.local/share/Tachidesk:Z
+    ports:
+      - 4568:${SUWAYOMI_PORT}
+
   jellyfin:
     image: jellyfin/jellyfin
     container_name: jellyfin
     restart: "unless-stopped"
+    networks:
+      - caddynet
     env_file:
       - .env 
     volumes:
@@ -89,13 +117,13 @@ services:
       - ${MEDIA_PATH}:/media:Z
     ports:
       - 8096:${JELLYFIN_PORT}
-    environment:
-      - JELLYFIN_PublishedServerUrl=${SERVER_URL}
 
   jellyseerr:
     image: fallenbagel/jellyseerr
     container_name: jellyseerr
     restart: unless-stopped
+    networks:
+      - caddynet
     env_file:
       - .env 
     environment:
@@ -106,11 +134,44 @@ services:
       - 5055:${JELLYSEERR_PORT}
     volumes:
       - ${JELLYSEERR_PATH}/config:/app/config:Z
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+
+  radarr:
+      image: lscr.io/linuxserver/radarr:latest
+      container_name: radarr
+      restart: unless-stopped
+      networks:
+        - caddynet
+      environment:
+        - TZ=Europe/Paris
+      volumes:
+        - ${RADARR_PATH}/config:/config:Z
+        - ${DATA_PATH}:/data:Z
+      ports:
+        - 7878:7878
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    networks:
+      - caddynet
+    environment:
+        - TZ=Europe/Paris
+    volumes:
+      - ${SONARR_PATH}/config:/config:Z
+      - ${DATA_PATH}:/data:Z
+    ports:
+      - 8989:8989
 
 volumes:
-  tailscale_data:     
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${TAILSCALE_DATA_PATH}
+
+networks:
+  caddynet:
+    attachable: true
+    driver: bridge
