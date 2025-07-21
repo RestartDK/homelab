@@ -14,9 +14,9 @@ services:
     env_file:
       - .env 
     volumes:
-      - $PWD/Caddyfile:/etc/caddy/Caddyfile:Z
-      - ${CERTIFICATES_PATH}:/data:Z
-      - ${CADDY_PATH}/config:/config:Z
+      - $PWD/Caddyfile:/etc/caddy/Caddyfile:Z   
+      - caddy_data:/data                       
+      - caddy_config:/config                   
     environment:
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
       - DOMAIN=${DOMAIN}
@@ -24,36 +24,9 @@ services:
       - KOMGA_PORT=${KOMGA_PORT}
       - JELLYFIN_PORT=${JELLYFIN_PORT}
       - JELLYSEERR_PORT=${JELLYSEERR_PORT}
-      - SERVER_IP=${SERVER_IP}
       - COCKPIT_PORT=${COCKPIT_PORT}
     extra_hosts:
          - host.docker.internal:host-gateway
-    
-  tailscale:
-      image: "tailscale/tailscale:latest"
-      container_name: tailscale
-      hostname: ${TAILSCALE_NAME}
-      restart: unless-stopped
-      network_mode: host
-      env_file:
-        - .env
-      cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-      environment:
-        # location of the state directory of tailscale daemon - needs to be persisted between restarts
-        - TS_STATE_DIR=/var/lib/tailscale
-        - TS_AUTHKEY=${TAILSCALE_AUTHKEY}
-        - TS_EXTRA_ARGS=--advertise-exit-node --advertise-routes=${LOCAL_ROUTES}
-      volumes:
-        - ${TAILSCALE_DATA_PATH}:/var/lib/tailscale:Z
-        - /dev/net/tun:/dev/net/tun
-      healthcheck:
-        test: ["CMD-SHELL", "tailscale status --peers=false --json | grep -q 'Online.*true'"]
-        interval: 1m30s
-        timeout: 10s
-        retries: 3
-        start_period: 40s
 
   glance:
     image: glanceapp/glance
@@ -64,8 +37,8 @@ services:
     env_file:
       - .env 
     volumes:
-      - ${GLANCE_PATH}/config:/app/config:Z
-      - ${ASSETS_PATH}:/app/assets:Z
+      - ${GLANCE_PATH}/config:/app/config
+      - ${ASSETS_PATH}:/app/assets
     ports:
       - 8080:${GLANCE_PORT}
     environment:
@@ -83,8 +56,8 @@ services:
     env_file:
       - .env 
     volumes:
-      - ${KOMGA_PATH}/config:/config:Z
-      - ${BOOKS_PATH}:/data:Z
+      - komga_config:/config                     
+      - ${BOOKS_PATH}:/data:Z                    
     ports:
       - 25600:${KOMGA_PORT}
 
@@ -99,7 +72,7 @@ services:
     environment:
       - TZ=Europe/Paris
     volumes:
-      - ${MANGA_PATH}:/home/suwayomi/.local/share/Tachidesk:Z
+      - ${MANGA_PATH}:/root/.local/share/Tachidesk:Z  
     ports:
       - 4568:${SUWAYOMI_PORT}
 
@@ -112,9 +85,9 @@ services:
     env_file:
       - .env 
     volumes:
-      - ${JELLYFIN_PATH}/config:/config:Z
-      - ${JELLYFIN_PATH}/cache:/cache:Z
-      - ${MEDIA_PATH}:/media:Z
+      - jellyfin_config:/config                  
+      - jellyfin_cache:/cache                    
+      - ${MEDIA_PATH}:/media:Z                   
     ports:
       - 8096:${JELLYFIN_PORT}
 
@@ -133,7 +106,7 @@ services:
     ports:
       - 5055:${JELLYSEERR_PORT}
     volumes:
-      - ${JELLYSEERR_PATH}/config:/app/config:Z
+      - jellyseerr_config:/app/config            
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
       start_period: 20s
@@ -142,18 +115,18 @@ services:
       retries: 3
 
   radarr:
-      image: lscr.io/linuxserver/radarr:latest
-      container_name: radarr
-      restart: unless-stopped
-      networks:
-        - caddynet
-      environment:
-        - TZ=Europe/Paris
-      volumes:
-        - ${RADARR_PATH}/config:/config:Z
-        - ${DATA_PATH}:/data:Z
-      ports:
-        - 7878:7878
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    networks:
+      - caddynet
+    environment:
+      - TZ=Europe/Paris
+    volumes:
+      - radarr_config:/config                    
+      - ${DATA_PATH}:/data:Z                     
+    ports:
+      - 7878:7878
 
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
@@ -162,16 +135,25 @@ services:
     networks:
       - caddynet
     environment:
-        - TZ=Europe/Paris
+      - TZ=Europe/Paris
     volumes:
-      - ${SONARR_PATH}/config:/config:Z
-      - ${DATA_PATH}:/data:Z
+      - sonarr_config:/config                    
+      - ${DATA_PATH}:/data:Z                     
     ports:
       - 8989:8989
-
-volumes:
 
 networks:
   caddynet:
     attachable: true
     driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:
+  glance_config:
+  komga_config:
+  jellyfin_config:
+  jellyfin_cache:
+  jellyseerr_config:
+  radarr_config:
+  sonarr_config:
