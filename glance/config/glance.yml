@@ -218,13 +218,16 @@ pages:
               - title: Komga
                 url: https://library.${DOMAIN}
                 icon: /assets/komga.svg
+              - title: Nextcloud
+                url: https://drive.${DOMAIN}
+                icon: /assets/nextcloud.svg
               - title: Radarr
                 url: https://radarr.${DOMAIN}
                 icon: /assets/radarr.svg
               - title: Sonarr
                 url: https://sonarr.${DOMAIN}
                 icon: /assets/sonarr.svg
-              - title: Tachidesk
+              - title: Suwayomi
                 url: https://manga.${DOMAIN}
                 icon: /assets/suwayomi.svg
               - title: Cockpit

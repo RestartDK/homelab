@@ -12,19 +12,35 @@ services:
       - "443:443"
       - "443:443/udp"
     env_file:
-      - .env 
-    volumes:
-      - $PWD/Caddyfile:/etc/caddy/Caddyfile:Z   
-      - caddy_data:/data:Z                       
-      - caddy_config:/config:Z                   
+      - .env
     environment:
-      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
       - DOMAIN=${DOMAIN}
+      - SERVER_URL=${SERVER_URL}
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
       - GLANCE_PORT=${GLANCE_PORT}
+      - GLANCE_DOCKER_PORT=${GLANCE_DOCKER_PORT}
       - KOMGA_PORT=${KOMGA_PORT}
+      - KOMGA_DOCKER_PORT=${KOMGA_DOCKER_PORT}
       - JELLYFIN_PORT=${JELLYFIN_PORT}
+      - JELLYFIN_DOCKER_PORT=${JELLYFIN_DOCKER_PORT}
       - JELLYSEERR_PORT=${JELLYSEERR_PORT}
+      - JELLYSEERR_DOCKER_PORT=${JELLYSEERR_DOCKER_PORT}
+      - RADARR_PORT=${RADARR_PORT}
+      - RADARR_DOCKER_PORT=${RADARR_DOCKER_PORT}
+      - SONARR_PORT=${SONARR_PORT}
+      - SONARR_DOCKER_PORT=${SONARR_DOCKER_PORT}
+      - PROWLARR_PORT=${PROWLARR_PORT}
+      - PROWLARR_DOCKER_PORT=${PROWLARR_DOCKER_PORT}
+      - SUWAYOMI_PORT=${SUWAYOMI_PORT}
+      - SUWAYOMI_DOCKER_PORT=${SUWAYOMI_DOCKER_PORT}
+      - NEXTCLOUD_PORT=${NEXTCLOUD_PORT}
+      - NEXTCLOUD_DOCKER_PORT=${NEXTCLOUD_DOCKER_PORT}
       - COCKPIT_PORT=${COCKPIT_PORT}
+
+    volumes:
+      - $PWD/Caddyfile:/etc/caddy/Caddyfile:Z
+      - caddy_data:/data:Z
+      - caddy_config:/config:Z
     extra_hosts:
          - host.docker.internal:host-gateway
 
@@ -35,18 +51,16 @@ services:
     networks:
       - caddynet
     env_file:
-      - .env 
-    volumes:
-      - ${GLANCE_PATH}/config:/app/config:Z
-      - ${ASSETS_PATH}:/app/assets:Z
-    ports:
-      - 8080:${GLANCE_PORT}
+      - .env
     environment:
-      - GLANCE_PORT=${GLANCE_PORT}
-      - TAILSCALE_API_KEY=${TAILSCALE_API_KEY}
       - GLANCE_SECRET=${GLANCE_SECRET}
       - GLANCE_DANIEL_PASSWORD=${GLANCE_DANIEL_PASSWORD}
-      - SERVER_URL=${SERVER_URL}
+      - GLANCE_PORT=${GLANCE_PORT}
+    volumes:
+      - ${GLANCE_PATH}/config:/app/config:Z
+      - ${ASSETS_PATH}:/app/assets
+    ports:
+      - ${GLANCE_PORT}:${GLANCE_DOCKER_PORT}
 
   komga:
     image: gotson/komga
@@ -55,12 +69,17 @@ services:
     networks:
       - caddynet
     env_file:
-      - .env 
+      - .env
+    environment:
+      - KOMGA_PORT=${KOMGA_PORT}
+      - KOMGA_DOCKER_PORT=${KOMGA_DOCKER_PORT}
+      - KOMGA_PATH=${KOMGA_PATH}
+      - BOOKS_PATH=${BOOKS_PATH}
     volumes:
-      - komga_config:/config:Z                     
-      - ${BOOKS_PATH}:/data:Z                    
+      - komga_config:/config:Z
+      - ${BOOKS_PATH}:/data:Z
     ports:
-      - 25600:${KOMGA_PORT}
+      - ${KOMGA_PORT}:${KOMGA_DOCKER_PORT}
 
   suwayomi:
     image: ghcr.io/suwayomi/suwayomi-server:stable
@@ -70,12 +89,10 @@ services:
       - caddynet
     env_file:
       - .env
-    environment:
-      - TZ=Europe/Paris
     volumes:
-      - ${MANGA_PATH}:/root/.local/share/Tachidesk:Z  
+      - ${MANGA_PATH}:/root/.local/share/Tachidesk:Z
     ports:
-      - 4568:${SUWAYOMI_PORT}
+      - ${SUWAYOMI_PORT}:${SUWAYOMI_DOCKER_PORT}
 
   jellyfin:
     image: jellyfin/jellyfin
@@ -84,13 +101,13 @@ services:
     networks:
       - caddynet
     env_file:
-      - .env 
+      - .env
     volumes:
-      - jellyfin_config:/config:Z                  
-      - jellyfin_cache:/cache:Z                    
-      - ${MEDIA_PATH}:/media:Z                   
+      - jellyfin_config:/config:Z
+      - jellyfin_cache:/cache:Z
+      - ${MEDIA_PATH}:/media:Z
     ports:
-      - 8096:${JELLYFIN_PORT}
+      - ${JELLYFIN_PORT}:${JELLYFIN_DOCKER_PORT}
 
   jellyseerr:
     image: fallenbagel/jellyseerr
@@ -98,16 +115,13 @@ services:
     restart: unless-stopped
     networks:
       - caddynet
-    env_file:
-      - .env 
     environment:
       - LOG_LEVEL=debug
       - TZ=Europe/Paris
-      - PORT=${JELLYSEERR_PORT} 
     ports:
-      - 5055:${JELLYSEERR_PORT}
+      - ${JELLYSEERR_PORT}:${JELLYSEERR_DOCKER_PORT}
     volumes:
-      - jellyseerr_config:/app/config:Z            
+      - jellyseerr_config:/app/config:Z
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
       start_period: 20s
@@ -121,13 +135,11 @@ services:
     restart: unless-stopped
     networks:
       - caddynet
-    environment:
-      - TZ=Europe/Paris
     volumes:
-      - radarr_config:/config:Z                    
-      - ${DATA_PATH}:/data:Z                     
+      - radarr_config:/config:Z
+      - ${DATA_PATH}:/data:Z
     ports:
-      - 7878:${RADARR_PORT}
+      - ${RADARR_PORT}:${RADARR_DOCKER_PORT}
 
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
@@ -135,13 +147,11 @@ services:
     restart: unless-stopped
     networks:
       - caddynet
-    environment:
-      - TZ=Europe/Paris
     volumes:
-      - sonarr_config:/config:Z                    
-      - ${DATA_PATH}:/data:Z                     
+      - sonarr_config:/config:Z
+      - ${DATA_PATH}:/data:Z
     ports:
-      - 8989:${SONARR_PORT}
+      - ${SONARR_PORT}:${SONARR_DOCKER_PORT}
   
   prowlarr:
       image: lscr.io/linuxserver/prowlarr:latest
@@ -149,12 +159,61 @@ services:
       restart: unless-stopped
       networks:
         - caddynet
-      environment:
-        - TZ=Europe/Paris
       volumes:
         - prowlarr_config:/config:Z
       ports:
-        - 9696:${PROWLARR_PORT}
+        - ${PROWLARR_PORT}:${PROWLARR_DOCKER_PORT}
+
+  db:
+    image: mariadb:lts
+    container_name: nextcloud_db
+    restart: always
+    networks:
+      - caddynet
+    command: --transaction-isolation=READ-COMMITTED
+    volumes:
+      - db:/var/lib/mysql
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${NEXTCLOUD_DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${NEXTCLOUD_DB_NAME}
+      - MYSQL_USER=${NEXTCLOUD_DB_USER}
+      - MYSQL_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
+
+  redis:
+    image: redis:alpine
+    container_name: nextcloud_redis
+    restart: always
+    networks:
+      - caddynet
+    environment:
+      - REDIS_HOST=${NEXTCLOUD_REDIS_HOST}
+
+  nextcloud:
+    image: nextcloud
+    container_name: nextcloud
+    restart: always
+    networks:
+      - caddynet
+    ports:
+      - ${NEXTCLOUD_PORT}:${NEXTCLOUD_DOCKER_PORT}
+    depends_on:
+      - redis
+      - db
+    volumes:
+      - nextcloud:/var/www/html
+    env_file:
+      - .env
+    environment:
+      - MYSQL_HOST=${NEXTCLOUD_DB_HOST}
+      - MYSQL_DATABASE=${NEXTCLOUD_DB_NAME}
+      - MYSQL_USER=${NEXTCLOUD_DB_USER}
+      - MYSQL_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
+      - REDIS_HOST=${NEXTCLOUD_REDIS_HOST}
+      - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_TRUSTED_DOMAINS}
+      - NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_ADMIN_USER}
+      - NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_ADMIN_PASSWORD}
 
 networks:
   caddynet:
@@ -164,7 +223,6 @@ networks:
 volumes:
   caddy_data:
   caddy_config:
-  glance_config:
   komga_config:
   jellyfin_config:
   jellyfin_cache:
@@ -172,3 +230,5 @@ volumes:
   radarr_config:
   sonarr_config:
   prowlarr_config:
+  nextcloud:
+  db:

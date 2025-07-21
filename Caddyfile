@@ -1,6 +1,6 @@
 # Glance dashboard
 dashboard.{env.DOMAIN} {
-	reverse_proxy glance:{env.GLANCE_PORT}
+	reverse_proxy glance:{env.GLANCE_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 		resolvers 1.1.1.1
@@ -9,7 +9,7 @@ dashboard.{env.DOMAIN} {
 
 # Komga service
 library.{env.DOMAIN} {
-	reverse_proxy komga:{env.KOMGA_PORT}
+	reverse_proxy komga:{env.KOMGA_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 		resolvers 1.1.1.1
@@ -18,7 +18,7 @@ library.{env.DOMAIN} {
 
 # Jellyfin service
 media.{env.DOMAIN} {
-	reverse_proxy jellyfin:{env.JELLYFIN_PORT}
+	reverse_proxy jellyfin:{env.JELLYFIN_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 		resolvers 1.1.1.1
@@ -27,7 +27,7 @@ media.{env.DOMAIN} {
 
 # Jellyseerr service
 media-request.{env.DOMAIN} {
-	reverse_proxy jellyseerr:{env.JELLYSEERR_PORT}
+	reverse_proxy jellyseerr:{env.JELLYSEERR_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 		resolvers 1.1.1.1
@@ -36,7 +36,7 @@ media-request.{env.DOMAIN} {
 
 # Radarr service
 radarr.{env.DOMAIN} {
-	reverse_proxy radarr:{env.RADARR_PORT}
+	reverse_proxy radarr:{env.RADARR_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 		resolvers 1.1.1.1
@@ -45,7 +45,7 @@ radarr.{env.DOMAIN} {
 
 # Sonarr service
 sonarr.{env.DOMAIN} {
-	reverse_proxy sonarr:{env.SONARR_PORT}
+	reverse_proxy sonarr:{env.SONARR_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 		resolvers 1.1.1.1
@@ -54,7 +54,7 @@ sonarr.{env.DOMAIN} {
 
 # Suwayomi service
 manga.{env.DOMAIN} {
-	reverse_proxy suwayomi:{env.SUWAYOMI_PORT}
+	reverse_proxy suwayomi:{env.SUWAYOMI_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 		resolvers 1.1.1.1
@@ -63,7 +63,16 @@ manga.{env.DOMAIN} {
 
 # Prowlarr service
 prowlarr.{env.DOMAIN} {
-	reverse_proxy prowlarr:{env.PROWLARR_PORT}
+	reverse_proxy prowlarr:{env.PROWLARR_DOCKER_PORT}
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+		resolvers 1.1.1.1
+	}
+}
+
+# Nextcloud service 
+drive.{env.DOMAIN} {
+	reverse_proxy nextcloud:{env.NEXTCLOUD_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 		resolvers 1.1.1.1
