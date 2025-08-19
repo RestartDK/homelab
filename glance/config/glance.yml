@@ -105,6 +105,9 @@ pages:
               - title: Jellyfin
                 url: https://media.${DOMAIN}
                 icon: /assets/jellyfin.svg
+              - title: Portainer
+                url: https://portainer.${DOMAIN}
+                icon: /assets/portainer.svg
               - title: Jellyseerr
                 url: https://media-request.${DOMAIN}
                 icon: /assets/jellyseerr.svg
@@ -132,6 +135,9 @@ pages:
               - title: AdGuard Home
                 url: https://adguard.${DOMAIN}
                 icon: /assets/adguard-home.svg
+              - title: Dokploy
+                url: https://dokploy.${DOMAIN}
+                icon: /assets/dokploy.svg
 
           - type: docker-containers
             title: Homelab containers
