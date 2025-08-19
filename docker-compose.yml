@@ -46,50 +46,6 @@ services:
     extra_hosts:
          - host.docker.internal:host-gateway
 
-  # cup:
-  #   image: ghcr.io/sergi0g/cup:latest
-  #   container_name: cup 
-  #   restart: unless-stopped
-  #   user: "1000:1000"
-  #   env_file:
-  #     - .env
-  #   command: ["-c", "/config/cup.json", "serve"]
-  #   environment:
-  #     - CUP_PORT=${CUP_PORT}
-  #     - CUP_CONFIG=${CUP_CONFIG}
-  #     - DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
-  #   ports:
-  #     - ${CUP_PORT}:${CUP_DOCKER_PORT}
-  #   volumes:
-  #     # - /var/run/docker.sock:/var/run/docker.sock
-  #     # - /run/user/1000/podman/podman.sock:/var/run/docker.sock:z  # Mount Podman socket to Docker path
-  #     # - /run/user/1000/podman/podman.sock:/run/user/1000/podman/podman.sock:z
-  #     # - /run/user/1000/podman/podman.sock:/var/run/docker.sock:z
-  #     - ${CUP_CONFIG}:/config/cup.json
-
-  # pihole:
-  #     image: pihole/pihole:latest
-  #     container_name: pihole
-  #     restart: unless-stopped
-  #     networks:
-  #       - caddynet
-  #     env_file:
-  #       - .env
-  #     ports:
-  #       # DNS Ports
-  #       - "${PIHOLE_DNS_PORT}:${PIHOLE_DOCKER_DNS_PORT}/tcp"
-  #       - "${PIHOLE_DNS_PORT}:${PIHOLE_DOCKER_DNS_PORT}/udp"
-  #       - "${PIHOLE_HTTP_PORT}:${PIHOLE_DOCKER_HTTP_PORT}/tcp"
-  #       - "${PIHOLE_HTTPS_PORT}:${PIHOLE_DOCKER_HTTPS_PORT}/tcp"
-  #     environment:
-  #       TZ: 'Europe/Paris'
-  #       FTLCONF_dns_upstreams: '1.1.1.1;1.0.0.1'
-  #       FTLCONF_webserver_api_password: ${PIHOLE_WEB_PASSWORD}
-  #       FTLCONF_dns_listeningMode: 'all'
-  #     volumes:
-  #       - pihole_config:/etc/pihole:Z
-  #     cap_add:
-  #       - NET_ADMIN
   adguardhome:  
     image: adguard/adguardhome  
     container_name: adguardhome  
@@ -100,7 +56,6 @@ services:
       glance.url: https://adguard.${DOMAIN}
       glance.category: infra
     networks:
-      # - adguardnet
       - caddynet
     env_file:
       - .env
@@ -115,9 +70,9 @@ services:
       # Expose port 3000 on TCP for AdGuard Home's API
       - "${ADGUARD_API_PORT}:${ADGUARD_DOCKER_API_PORT}/tcp"
 
-    volumes:  # Mount host directories as volumes inside the container
-      - adguard_config:/opt/adguardhome/work:Z  # Mount work directory
-      - adguard_confdir:/opt/adguardhome/conf:Z  # Mount config directory
+    volumes:  
+      - adguard_config:/opt/adguardhome/work:Z  
+      - adguard_confdir:/opt/adguardhome/conf:Z  
 
 
   glance:
