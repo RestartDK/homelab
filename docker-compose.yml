@@ -5,6 +5,8 @@ services:
     hostname: caddy
     image: restartdk/caddy-cloudflare:latest
     restart: unless-stopped
+    depends_on:
+      - adguardhome
     networks:
       - caddynet
     ports:
@@ -17,6 +19,7 @@ services:
       - DOMAIN=${DOMAIN}
       - SERVER_URL=${SERVER_URL}
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - CUP_DOCKER_PORT=${CUP_DOCKER_PORT}
       - GLANCE_PORT=${GLANCE_PORT}
       - GLANCE_DOCKER_PORT=${GLANCE_DOCKER_PORT}
       - KOMGA_PORT=${KOMGA_PORT}
@@ -36,13 +39,41 @@ services:
       - NEXTCLOUD_PORT=${NEXTCLOUD_PORT}
       - NEXTCLOUD_DOCKER_PORT=${NEXTCLOUD_DOCKER_PORT}
       - COCKPIT_PORT=${COCKPIT_PORT}
-
     volumes:
       - $PWD/Caddyfile:/etc/caddy/Caddyfile:Z
       - caddy_data:/data:Z
       - caddy_config:/config:Z
     extra_hosts:
          - host.docker.internal:host-gateway
+
+  adguardhome:  
+    image: adguard/adguardhome  
+    container_name: adguardhome  
+    restart: unless-stopped  
+    labels:
+      glance.name: AdGuard Home
+      glance.icon: si:adguard
+      glance.url: https://adguard.${DOMAIN}
+      glance.category: infra
+    networks:
+      - caddynet
+    env_file:
+      - .env
+    ports:  
+      # Expose port 53 on TCP and UDP for DNS queries
+      - "${ADGUARD_DNS_PORT}:${ADGUARD_DOCKER_DNS_PORT}/tcp"
+      - "${ADGUARD_DNS_PORT}:${ADGUARD_DOCKER_DNS_PORT}/udp"
+
+      # Expose port 80 on TCP for HTTP web interface
+      - "${ADGUARD_HTTP_PORT}:${ADGUARD_DOCKER_HTTP_PORT}/tcp"
+
+      # Expose port 3000 on TCP for AdGuard Home's API
+      - "${ADGUARD_API_PORT}:${ADGUARD_DOCKER_API_PORT}/tcp"
+
+    volumes:  
+      - adguard_config:/opt/adguardhome/work:Z  
+      - adguard_confdir:/opt/adguardhome/conf:Z  
+
 
   glance:
     image: glanceapp/glance
@@ -55,10 +86,10 @@ services:
     environment:
       - GLANCE_SECRET=${GLANCE_SECRET}
       - GLANCE_DANIEL_PASSWORD=${GLANCE_DANIEL_PASSWORD}
-      - GLANCE_PORT=${GLANCE_PORT}
     volumes:
       - ${GLANCE_PATH}/config:/app/config:Z
       - ${ASSETS_PATH}:/app/assets
+      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:z
     ports:
       - ${GLANCE_PORT}:${GLANCE_DOCKER_PORT}
 
@@ -66,6 +97,11 @@ services:
     image: gotson/komga
     container_name: komga
     restart: unless-stopped
+    labels:
+      glance.name: Komga
+      glance.icon: si:komga
+      glance.url: https://library.${DOMAIN}
+      glance.category: media
     networks:
       - caddynet
     env_file:
@@ -81,23 +117,15 @@ services:
     ports:
       - ${KOMGA_PORT}:${KOMGA_DOCKER_PORT}
 
-  suwayomi:
-    image: ghcr.io/suwayomi/suwayomi-server:stable
-    container_name: suwayomi
-    restart: unless-stopped
-    networks:
-      - caddynet
-    env_file:
-      - .env
-    volumes:
-      - ${MANGA_PATH}:/root/.local/share/Tachidesk:Z
-    ports:
-      - ${SUWAYOMI_PORT}:${SUWAYOMI_DOCKER_PORT}
-
   jellyfin:
     image: jellyfin/jellyfin
     container_name: jellyfin
     restart: "unless-stopped"
+    labels:
+      glance.name: Jellyfin
+      glance.icon: si:jellyfin
+      glance.url: https://media.${DOMAIN}
+      glance.category: media
     networks:
       - caddynet
     env_file:
@@ -113,6 +141,11 @@ services:
     image: fallenbagel/jellyseerr
     container_name: jellyseerr
     restart: unless-stopped
+    labels:
+      glance.name: Jellyseerr
+      glance.icon: si:jellyseerr
+      glance.url: https://jellyseerr.${DOMAIN}
+      glance.category: media
     networks:
       - caddynet
     environment:
@@ -133,6 +166,11 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     restart: unless-stopped
+    labels:
+      glance.name: Radarr
+      glance.icon: si:radarr
+      glance.url: https://radarr.${DOMAIN}
+      glance.category: media
     networks:
       - caddynet
     volumes:
@@ -145,6 +183,11 @@ services:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
     restart: unless-stopped
+    labels:
+      glance.name: Sonarr
+      glance.icon: si:sonarr
+      glance.url: https://sonarr.${DOMAIN}
+      glance.category: media
     networks:
       - caddynet
     volumes:
@@ -157,6 +200,11 @@ services:
       image: lscr.io/linuxserver/prowlarr:latest
       container_name: prowlarr
       restart: unless-stopped
+      labels:
+        glance.name: Prowlarr
+        glance.icon: si:prowlarr
+        glance.url: https://prowlarr.${DOMAIN}
+        glance.category: media
       networks:
         - caddynet
       volumes:
@@ -164,61 +212,60 @@ services:
       ports:
         - ${PROWLARR_PORT}:${PROWLARR_DOCKER_PORT}
 
-  db:
-    image: mariadb:lts
-    container_name: nextcloud_db
-    restart: always
-    networks:
-      - caddynet
-    command: --transaction-isolation=READ-COMMITTED
-    volumes:
-      - db:/var/lib/mysql
-    env_file:
-      - .env
-    environment:
-      - MYSQL_ROOT_PASSWORD=${NEXTCLOUD_DB_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${NEXTCLOUD_DB_NAME}
-      - MYSQL_USER=${NEXTCLOUD_DB_USER}
-      - MYSQL_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
+  # db:
+  #   image: mariadb:lts
+  #   container_name: nextcloud_db
+  #   restart: always
+  #   networks:
+  #     - caddynet
+  #   command: --transaction-isolation=READ-COMMITTED
+  #   volumes:
+  #     - db:/var/lib/mysql
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=${NEXTCLOUD_DB_ROOT_PASSWORD}
+  #     - MYSQL_DATABASE=${NEXTCLOUD_DB_NAME}
+  #     - MYSQL_USER=${NEXTCLOUD_DB_USER}
+  #     - MYSQL_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
 
-  redis:
-    image: redis:alpine
-    container_name: nextcloud_redis
-    restart: always
-    networks:
-      - caddynet
-    environment:
-      - REDIS_HOST=${NEXTCLOUD_REDIS_HOST}
+  # redis:
+  #   image: redis:alpine
+  #   container_name: nextcloud_redis
+  #   restart: always
+  #   networks:
+  #     - caddynet
+  #   environment:
+  #     - REDIS_HOST=${NEXTCLOUD_REDIS_HOST}
 
-  nextcloud:
-    image: nextcloud
-    container_name: nextcloud
-    restart: always
-    networks:
-      - caddynet
-    ports:
-      - ${NEXTCLOUD_PORT}:${NEXTCLOUD_DOCKER_PORT}
-    depends_on:
-      - redis
-      - db
-    volumes:
-      - nextcloud:/var/www/html
-    env_file:
-      - .env
-    environment:
-      - MYSQL_HOST=${NEXTCLOUD_DB_HOST}
-      - MYSQL_DATABASE=${NEXTCLOUD_DB_NAME}
-      - MYSQL_USER=${NEXTCLOUD_DB_USER}
-      - MYSQL_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
-      - REDIS_HOST=${NEXTCLOUD_REDIS_HOST}
-      - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_TRUSTED_DOMAINS}
-      - NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_ADMIN_USER}
-      - NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_ADMIN_PASSWORD}
+  # nextcloud:
+  #   image: nextcloud
+  #   container_name: nextcloud
+  #   restart: always
+  #   networks:
+  #     - caddynet
+  #   ports:
+  #     - ${NEXTCLOUD_PORT}:${NEXTCLOUD_DOCKER_PORT}
+  #   depends_on:
+  #     - redis
+  #     - db
+  #   volumes:
+  #     - nextcloud:/var/www/html
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - MYSQL_HOST=${NEXTCLOUD_DB_HOST}
+  #     - MYSQL_DATABASE=${NEXTCLOUD_DB_NAME}
+  #     - MYSQL_USER=${NEXTCLOUD_DB_USER}
+  #     - MYSQL_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
+  #     - REDIS_HOST=${NEXTCLOUD_REDIS_HOST}
+  #     - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_TRUSTED_DOMAINS}
+  #     - NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_ADMIN_USER}
+  #     - NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_ADMIN_PASSWORD}
 
 networks:
   caddynet:
-    attachable: true
-    driver: bridge
+    external: true
 
 volumes:
   caddy_data:
@@ -232,3 +279,5 @@ volumes:
   prowlarr_config:
   nextcloud:
   db:
+  adguard_config:
+  adguard_confdir:

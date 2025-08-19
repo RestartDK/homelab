@@ -1,6 +1,5 @@
 server:
   proxied: true
-  port: ${GLANCE_PORT}
   assets-path: /app/assets
 auth:
   secret-key: ${GLANCE_SECRET}
@@ -79,6 +78,64 @@ pages:
               - url: https://samwho.dev/rss.xml
               - url: https://ishadeed.com/feed.xml
                 title: Ahmad Shadeed
+
+      - size: small
+        widgets:
+          - type: releases
+            show-source-icon: true
+            repositories:
+              - RestartDK/homelab
+
+  - name: Admin
+    columns:
+      - size: small
+        widgets:
+          - type: dns-stats
+            service: adguard
+            url: https://adguard.chateauducipieres.com
+            username: ${ADGUARD_USERNAME}
+            password: ${ADGUARD_PASSWORD}
+
+      - size: full
+        widgets:
+          - type: monitor
+            cache: 1m
+            title: Services
+            sites:
+              - title: Jellyfin
+                url: https://media.${DOMAIN}
+                icon: /assets/jellyfin.svg
+              - title: Jellyseerr
+                url: https://media-request.${DOMAIN}
+                icon: /assets/jellyseerr.svg
+              - title: Komga
+                url: https://library.${DOMAIN}
+                icon: /assets/komga.svg
+              - title: Nextcloud
+                url: https://drive.${DOMAIN}
+                icon: /assets/nextcloud.svg
+              - title: Radarr
+                url: https://radarr.${DOMAIN}
+                icon: /assets/radarr.svg
+              - title: Sonarr
+                url: https://sonarr.${DOMAIN}
+                icon: /assets/sonarr.svg
+              - title: Suwayomi
+                url: https://manga.${DOMAIN}
+                icon: /assets/suwayomi.svg
+              - title: Cockpit
+                url: https://admin.${DOMAIN}
+                icon: /assets/cockpit.svg
+              - title: Prowlarr
+                url: https://prowlarr.${DOMAIN}
+                icon: /assets/prowlarr.svg
+              - title: AdGuard Home
+                url: https://adguard.${DOMAIN}
+                icon: /assets/adguard-home.svg
+
+          - type: docker-containers
+            title: Homelab containers
+            hide-by-default: false
 
       - size: small
         widgets:
@@ -204,35 +261,3 @@ pages:
                 </li>
                 {{ end }}
               </ul>
-
-          - type: monitor
-            cache: 1m
-            title: Services
-            sites:
-              - title: Jellyfin
-                url: https://media.${DOMAIN}
-                icon: /assets/jellyfin.svg
-              - title: Jellyseerr
-                url: https://media-request.${DOMAIN}
-                icon: /assets/jellyseerr.svg
-              - title: Komga
-                url: https://library.${DOMAIN}
-                icon: /assets/komga.svg
-              - title: Nextcloud
-                url: https://drive.${DOMAIN}
-                icon: /assets/nextcloud.svg
-              - title: Radarr
-                url: https://radarr.${DOMAIN}
-                icon: /assets/radarr.svg
-              - title: Sonarr
-                url: https://sonarr.${DOMAIN}
-                icon: /assets/sonarr.svg
-              - title: Suwayomi
-                url: https://manga.${DOMAIN}
-                icon: /assets/suwayomi.svg
-              - title: Cockpit
-                url: https://admin.${DOMAIN}
-                icon: /assets/cockpit.svg
-              - title: Prowlarr
-                url: https://prowlarr.${DOMAIN}
-                icon: /assets/prowlarr.svg
