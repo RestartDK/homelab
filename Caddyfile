@@ -6,6 +6,14 @@ dashboard.{env.DOMAIN} {
 	}
 }
 
+# Dokploy UI (remote server)
+dokploy.{env.DOMAIN} {
+	reverse_proxy dokploy:{env.DOKPLOY_UI_PORT}
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+}
+
 # Komga service
 library.{env.DOMAIN} {
 	reverse_proxy komga:{env.KOMGA_DOCKER_PORT}
@@ -73,6 +81,19 @@ drive.{env.DOMAIN} {
 # AdGuard Home service 
 adguard.{env.DOMAIN} {
 	reverse_proxy adguardhome:{env.ADGUARD_DOCKER_HTTP_PORT}
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+}
+
+# Portainer service
+portainer.{env.DOMAIN} {
+	reverse_proxy https://portainer:9443 {
+		transport http {
+			tls
+			tls_insecure_skip_verify
+		}
+	}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 	}
