@@ -138,6 +138,9 @@ pages:
               - title: Dokploy
                 url: https://dokploy.${DOMAIN}
                 icon: /assets/dokploy.svg
+              - title: Ollama
+                url: https://ollama.${DOMAIN}
+                icon: /assets/ollama.svg
 
           - type: docker-containers
             title: Homelab containers

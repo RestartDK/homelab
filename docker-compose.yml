@@ -41,6 +41,8 @@ services:
       - COCKPIT_PORT=${COCKPIT_PORT}
       - DOKPLOY_HOST=${DOKPLOY_HOST}
       - DOKPLOY_UI_PORT=${DOKPLOY_UI_PORT}
+      - OLLAMA_HOST=${OLLAMA_HOST}
+      - OLLAMA_PORT=${OLLAMA_PORT}
     volumes:
       - $PWD/Caddyfile:/etc/caddy/Caddyfile:Z
       - caddy_data:/data:Z
@@ -48,6 +50,7 @@ services:
     extra_hosts:
          - host.docker.internal:host-gateway
          - dokploy:${DOKPLOY_HOST}
+         - ollama:${OLLAMA_HOST}
 
   adguardhome:  
     image: adguard/adguardhome  
