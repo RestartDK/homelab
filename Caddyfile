@@ -14,6 +14,14 @@ dokploy.{env.DOMAIN} {
 	}
 }
 
+# Ollama API (remote server)
+ollama.{env.DOMAIN} {
+	reverse_proxy ollama:{env.OLLAMA_PORT}
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+}
+
 # Komga service
 library.{env.DOMAIN} {
 	reverse_proxy komga:{env.KOMGA_DOCKER_PORT}
