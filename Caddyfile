@@ -3,7 +3,6 @@ dashboard.{env.DOMAIN} {
 	reverse_proxy glance:{env.GLANCE_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-		resolvers 1.1.1.1
 	}
 }
 
@@ -12,7 +11,6 @@ library.{env.DOMAIN} {
 	reverse_proxy komga:{env.KOMGA_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-		resolvers 1.1.1.1
 	}
 }
 
@@ -21,16 +19,14 @@ media.{env.DOMAIN} {
 	reverse_proxy jellyfin:{env.JELLYFIN_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-		resolvers 1.1.1.1
 	}
 }
 
 # Jellyseerr service
-media-request.{env.DOMAIN} {
+jellyseerr.{env.DOMAIN} {
 	reverse_proxy jellyseerr:{env.JELLYSEERR_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-		resolvers 1.1.1.1
 	}
 }
 
@@ -39,7 +35,6 @@ radarr.{env.DOMAIN} {
 	reverse_proxy radarr:{env.RADARR_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-		resolvers 1.1.1.1
 	}
 }
 
@@ -48,7 +43,6 @@ sonarr.{env.DOMAIN} {
 	reverse_proxy sonarr:{env.SONARR_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-		resolvers 1.1.1.1
 	}
 }
 
@@ -57,7 +51,6 @@ manga.{env.DOMAIN} {
 	reverse_proxy suwayomi:{env.SUWAYOMI_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-		resolvers 1.1.1.1
 	}
 }
 
@@ -66,7 +59,6 @@ prowlarr.{env.DOMAIN} {
 	reverse_proxy prowlarr:{env.PROWLARR_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-		resolvers 1.1.1.1
 	}
 }
 
@@ -75,7 +67,14 @@ drive.{env.DOMAIN} {
 	reverse_proxy nextcloud:{env.NEXTCLOUD_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-		resolvers 1.1.1.1
+	}
+}
+
+# AdGuard Home service 
+adguard.{env.DOMAIN} {
+	reverse_proxy adguardhome:{env.ADGUARD_DOCKER_HTTP_PORT}
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 	}
 }
 
@@ -89,6 +88,5 @@ admin.{env.DOMAIN} {
 	}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-		resolvers 1.1.1.1
 	}
 }
