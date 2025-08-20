@@ -39,12 +39,18 @@ services:
       - NEXTCLOUD_PORT=${NEXTCLOUD_PORT}
       - NEXTCLOUD_DOCKER_PORT=${NEXTCLOUD_DOCKER_PORT}
       - COCKPIT_PORT=${COCKPIT_PORT}
+      - DOKPLOY_HOST=${DOKPLOY_HOST}
+      - DOKPLOY_UI_PORT=${DOKPLOY_UI_PORT}
+      - OLLAMA_HOST=${OLLAMA_HOST}
+      - OLLAMA_PORT=${OLLAMA_PORT}
     volumes:
       - $PWD/Caddyfile:/etc/caddy/Caddyfile:Z
       - caddy_data:/data:Z
       - caddy_config:/config:Z
     extra_hosts:
          - host.docker.internal:host-gateway
+         - dokploy:${DOKPLOY_HOST}
+         - ollama:${OLLAMA_HOST}
 
   adguardhome:  
     image: adguard/adguardhome  
@@ -212,6 +218,25 @@ services:
       ports:
         - ${PROWLARR_PORT}:${PROWLARR_DOCKER_PORT}
 
+  portainer:
+    image: portainer/portainer-ce:lts
+    container_name: portainer
+    restart: always
+    privileged: true
+    networks:
+      - caddynet
+    ports:
+      - "8000:8000"
+      - "9443:9443"
+    volumes:
+      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:z
+      - portainer_data:/data
+    labels:
+      glance.name: Portainer
+      glance.icon: si:portainer
+      glance.url: https://portainer.${DOMAIN}
+      glance.category: infra
+
   # db:
   #   image: mariadb:lts
   #   container_name: nextcloud_db
@@ -281,3 +306,4 @@ volumes:
   db:
   adguard_config:
   adguard_confdir:
+  portainer_data:

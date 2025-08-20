@@ -1,11 +1,24 @@
 # TODO
 
 - [x] Need to add the dns server ip to be persistent
-- [ ] Add portainer to docker compose
+- [x] Add portainer to docker compose
+- [x] Add dokploy on other server to caddy net
+- [x] Setup dokploy
+- [x] Add dokploy to glance.yml
+- [x] Add dokploy to portainer
+- [ ] Add ollama to big server
+- [ ] Add grafana for data monitoring
 - [ ] Move adguard config to this repo instead
 - [ ] Setup DNS for second computer
 - [ ] Setup other computer and deploy dokploy and gh self hosted runner
 - [ ] Fix big computer and setup ssh keys for it and tailscale access.
+
+# Planned for the future
+
+- Find a better way to manage secrets for all the servers (duplicate .envs for all of them right now)
+- Automated configuration using ansible
+- Proper CI/CD with github actions to apply changes to infra in one place
+- K3s for automatic load balancing and better managmenet across computers
 
 Hey.
 
