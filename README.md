@@ -15,6 +15,7 @@
 
 # Planned for the future
 
+- Find a better way to manage secrets for all the servers (duplicate .envs for all of them right now)
 - Automated configuration using ansible
 - Proper CI/CD with github actions to apply changes to infra in one place
 - K3s for automatic load balancing and better managmenet across computers
