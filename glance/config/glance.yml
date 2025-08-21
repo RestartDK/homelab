@@ -47,7 +47,7 @@ pages:
             timezones:
               - timezone: Europe/Madrid
                 label: Madrid
-              - timezone: America/Boston
+              - timezone: America/New_York
                 label: Boston
           - type: calendar
             first-day-of-week: monday
@@ -102,19 +102,22 @@ pages:
             url: https://adguard.chateauducipieres.com
             username: ${ADGUARD_USERNAME}
             password: ${ADGUARD_PASSWORD}
-      - type: server-stats
-        servers:
-          - type: local
-            hide-mountpoints-by-default: true
-            mountpoints:
-              "/":
-                hide: false
-              "/mnt/data":
-                hide: false
-          - type: remote
-            url: ${DOKPLOY_HOST}
-          - type: remote
-            url: ${OLLAMA_HOST}
+          - type: server-stats
+            servers:
+              - type: local
+                name: "srv-geisha"
+                hide-mountpoints-by-default: true
+                mountpoints:
+                  "/":
+                    hide: false
+                  "/mnt/data":
+                    hide: false
+              - type: remote
+                name: "srv-hatchi"
+                url: ${DOKPLOY_HOST}
+              - type: remote
+                name: "srv-nana"
+                url: ${OLLAMA_HOST}
       - size: full
         widgets:
           - type: monitor
@@ -167,7 +170,6 @@ pages:
 
       - size: small
         widgets:
-          
           - type: custom-api
             title: Tailscale Devices
             title-url: https://login.tailscale.com/admin/machines
