@@ -1,0 +1,49 @@
+Todo:
+  ✘ Build custom caddy with cloudflare docker image @started(25-07-19 17:01) @cancelled(25-07-19 17:05) @wasted(4m24s)
+  ✔ Setup cloudflare with subdomains @started(25-07-19 15:16) @done(25-07-19 17:41) @lasted(2h25m8s)
+  ✔ Setup caddy file (double check) @started(25-07-19 17:41) @done(25-07-19 18:09) @lasted(28m41s)
+  ✔ Re setup caddy in docker compose for entire server @done(25-07-19 18:28)
+  ✔ Setup assets path @done(25-07-19 18:28)
+  ✔ Add a `/data` path for this project to store all data related to my homelab @done(25-07-19 18:29)
+  ✔ Setup glance properly @started(25-07-19 18:29) @done(25-07-19 19:28) @lasted(59m28s)
+  ✔ Demo if docker compose caddy setup works on mac with docker network, etc @started(25-07-19 19:28) @done(25-07-20 13:48) @lasted(18h20m27s)
+  ✔ Debug DNS issue with tailscale @done(25-08-21 17:16)
+  ✔ Setup docker container for tailscale @done(25-08-21 17:16)
+  ✔ See if you need caddy docker proxy or not @done(25-08-21 17:16)
+  ✔ Test all changes and see if it works @done(25-08-21 17:16)
+  ✔ Setup the cockpit with caddy tehe this will suck @done(25-08-21 17:16)
+  ✔ Debug issues @done(25-08-21 17:16)
+  ✔ Push to github @done(25-08-21 17:17)
+
+  ✔ Need to add the dns server ip to be persistent @done(25-08-21 17:17)
+  ✔ Add portainer to docker compose @done(25-08-21 17:17)
+  ✔ Add dokploy on other server to caddy net @done(25-08-21 17:17)
+  ✔ Setup dokploy @done(25-08-21 17:17)
+  ✔ Add dokploy to glance.yml @done(25-08-21 17:18)
+  ✔ Add dokploy to portainer @done(25-08-21 17:18)
+  ✔ Add ollama to big server @done(25-08-21 17:19)
+  ✔ Expose ollama port on big server so main server has access to it for caddy setup @done(25-08-21 17:27)
+  ✔ Fix caddy issue with ollama domain @done(25-08-21 18:04)
+  ✔ Add glance widget for server stats, and remote as well @done(25-08-21 18:23)
+  - Add Ollama to portainer @started(25-08-21 18:24)
+  - Fix ollama portainer agent so we can add it to portainer properly (stop it first it is constantly restarting)
+  Setup all media services:
+    - Setup Komga
+    - Setup Jellyfin
+    - Setup Sonarr
+    - Setup Radarr
+    - Setup Prowlarr
+    - Find a manga downloader (suwayomi if it can work)
+  - Fix podman compose going down randomly
+  - Make your own Go script for remote servers glance
+  - Add grafana for data monitoring
+  - Add gh self hosted runner to machine 2
+  - Move adguard config to this repo instead
+  - Fix ip to static for srv-nana
+
+Fix my server:
+  - Fix the ip of my computer to use the ethernet on
+  - Run all podman containers and set up dns
+  - Add all adguard rewrites back
+  - Add all portainer configs back
+  - Create glance agent to setup remote server connections

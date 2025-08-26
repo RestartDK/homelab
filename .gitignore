@@ -103,6 +103,3 @@ secrets/
 *.key
 *.pem
 *.crt
-
-# Other
-.todo
