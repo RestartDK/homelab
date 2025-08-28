@@ -1,6 +1,5 @@
 server:
   proxied: true
-  assets-path: /app/assets
 auth:
   secret-key: ${GLANCE_SECRET}
   users:
@@ -23,20 +22,6 @@ theme:
       positive-color: 86 27 42 
       negative-color: 352 55 52 
       accent-color: 218 34 45 
-    
-    kanso-mist:
-      background-color: 222 13 16 
-      primary-color: 150 4 78 
-      positive-color: 91 13 54 
-      negative-color: 353 70 65 
-      accent-color: 199 19 62 
-    
-    kanso-ink:
-      background-color: 220 18 10 
-      primary-color: 150 4 78 
-      positive-color: 91 13 54 
-      negative-color: 353 70 65 
-      accent-color: 199 19 62 
 pages:
   - name: Home
     columns:
@@ -105,7 +90,7 @@ pages:
           - type: server-stats
             servers:
               - type: local
-                name: "srv-geisha"
+                name: "srv-hatchi"
                 hide-mountpoints-by-default: true
                 mountpoints:
                   "/":
@@ -113,11 +98,8 @@ pages:
                   "/mnt/data":
                     hide: false
               - type: remote
-                name: "srv-hatchi"
-                url: ${DOKPLOY_HOST}
-              - type: remote
                 name: "srv-nana"
-                url: ${OLLAMA_HOST}
+                url: http://${OLLAMA_HOST}
       - size: full
         widgets:
           - type: monitor
@@ -126,43 +108,43 @@ pages:
             sites:
               - title: Jellyfin
                 url: https://media.${DOMAIN}
-                icon: /assets/jellyfin.svg
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/jellyfin.svg
               - title: Portainer
                 url: https://portainer.${DOMAIN}
-                icon: /assets/portainer.svg
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/portainer.svg
               - title: Jellyseerr
                 url: https://jellyseerr.${DOMAIN}
-                icon: /assets/jellyseerr.svg
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/jellyseerr.svg
               - title: Komga
                 url: https://library.${DOMAIN}
-                icon: /assets/komga.svg
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/komga.svg
               - title: Nextcloud
                 url: https://drive.${DOMAIN}
-                icon: /assets/nextcloud.svg
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/nextcloud.svg
               - title: Radarr
                 url: https://radarr.${DOMAIN}
-                icon: /assets/radarr.svg
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/radarr.svg
               - title: Sonarr
                 url: https://sonarr.${DOMAIN}
-                icon: /assets/sonarr.svg
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/sonarr.svg
               - title: Suwayomi
                 url: https://manga.${DOMAIN}
-                icon: /assets/suwayomi.svg
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/suwayomi.svg
               - title: Cockpit
                 url: https://admin.${DOMAIN}
-                icon: /assets/cockpit.svg
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/cockpit.svg
               - title: Prowlarr
                 url: https://prowlarr.${DOMAIN}
-                icon: /assets/prowlarr.svg
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/prowlarr.svg
               - title: AdGuard Home
                 url: https://adguard.${DOMAIN}
-                icon: /assets/adguard-home.svg
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/adguard-home.svg
               - title: Dokploy
                 url: https://dokploy.${DOMAIN}
-                icon: /assets/dokploy.svg
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/dokploy.svg
               - title: Ollama
                 url: https://ollama.${DOMAIN}
-                icon: /assets/ollama.svg
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/ollama.svg
 
           - type: docker-containers
             title: Homelab containers
