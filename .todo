@@ -25,7 +25,17 @@ Todo:
   ✔ Expose ollama port on big server so main server has access to it for caddy setup @done(25-08-21 17:27)
   ✔ Fix caddy issue with ollama domain @done(25-08-21 18:04)
   ✔ Add glance widget for server stats, and remote as well @done(25-08-21 18:23)
-  - Add Ollama to portainer @started(25-08-21 18:24)
+
+Fix my server:
+  ✔ Fix the ip of my computer to use the ethernet on @done(25-08-28 21:00)
+  ✔ Run all podman containers and set up dns @done(25-08-28 21:00)
+  ✔ Add all adguard rewrites back @done(25-08-28 21:00)
+  ✔ Add all portainer configs back @done(25-08-28 21:00)
+  - Fix the monitor on glance @started(25-08-28 21:02)
+  - Fix the docker containers widget on glance
+  - Create glance agent to setup remote server connections
+  - Add nextcloud back onto podman network
+  - Add Ollama to portainer
   - Fix ollama portainer agent so we can add it to portainer properly (stop it first it is constantly restarting)
   Setup all media services:
     - Setup Komga
@@ -40,10 +50,3 @@ Todo:
   - Add gh self hosted runner to machine 2
   - Move adguard config to this repo instead
   - Fix ip to static for srv-nana
-
-Fix my server:
-  - Fix the ip of my computer to use the ethernet on
-  - Run all podman containers and set up dns
-  - Add all adguard rewrites back
-  - Add all portainer configs back
-  - Create glance agent to setup remote server connections
