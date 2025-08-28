@@ -49,7 +49,6 @@ services:
       - caddy_config:/config:Z
     extra_hosts:
          - host.docker.internal:host-gateway
-         - dokploy:${DOKPLOY_HOST}
          - ollama:${OLLAMA_HOST}
 
   adguardhome:  
@@ -78,7 +77,7 @@ services:
 
     volumes:  
       - adguard_config:/opt/adguardhome/work:Z  
-      - adguard_confdir:/opt/adguardhome/conf:Z  
+      - $PWD/adguard:/opt/adguardhome/conf:Z
 
 
   glance:
@@ -89,12 +88,9 @@ services:
       - caddynet
     env_file:
       - .env
-    environment:
-      - GLANCE_SECRET=${GLANCE_SECRET}
-      - GLANCE_DANIEL_PASSWORD=${GLANCE_DANIEL_PASSWORD}
     volumes:
       - ${GLANCE_PATH}/config:/app/config:Z
-      - ${ASSETS_PATH}:/app/assets
+      - ${ASSETS_PATH}:/app/assets:Z
       - /run/user/1000/podman/podman.sock:/var/run/docker.sock:z
     ports:
       - ${GLANCE_PORT}:${GLANCE_DOCKER_PORT}
