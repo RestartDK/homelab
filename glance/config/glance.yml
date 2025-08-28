@@ -95,8 +95,6 @@ pages:
                 mountpoints:
                   "/":
                     hide: false
-                  "/mnt/data":
-                    hide: false
               - type: remote
                 name: "srv-nana"
                 url: http://${OLLAMA_HOST}
@@ -145,10 +143,6 @@ pages:
               - title: Ollama
                 url: https://ollama.${DOMAIN}
                 icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/ollama.svg
-
-          - type: docker-containers
-            title: Homelab containers
-            hide-by-default: false
 
       - size: small
         widgets:
