@@ -119,7 +119,7 @@ services:
       - BOOKS_PATH=${BOOKS_PATH}
     volumes:
       - komga_config:/config:Z
-      - ${BOOKS_PATH}:/data:Z
+      - komga_data:/data:Z
     ports:
       - ${KOMGA_PORT}:${KOMGA_DOCKER_PORT}
 
@@ -295,6 +295,7 @@ networks:
 volumes:
   caddy_data:
   caddy_config:
+  komga_data:
   komga_config:
   jellyfin_config:
   jellyfin_cache:
