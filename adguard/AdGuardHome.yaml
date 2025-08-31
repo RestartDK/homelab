@@ -20,10 +20,12 @@ dns:
   ratelimit: 0
   ratelimit_subnet_len_ipv4: 24
   ratelimit_subnet_len_ipv6: 56
-  ratelimit_whitelist: []
+  ratelimit_whitelist:
+    - 192.168.200.70
   refuse_any: true
   upstream_dns:
-    - https://dns10.quad9.net/dns-query
+    - 94.140.14.14
+    - 94.140.15.15
   upstream_dns_file: ""
   bootstrap_dns:
     - 9.9.9.10
@@ -61,7 +63,7 @@ dns:
   bootstrap_prefer_ipv6: false
   upstream_timeout: 10s
   private_networks: []
-  use_private_ptr_resolvers: true
+  use_private_ptr_resolvers: false
   local_ptr_upstreams: []
   use_dns64: false
   dns64_prefixes: []
@@ -169,7 +171,7 @@ filtering:
       answer: 192.168.200.70
     - domain: prowlarr.chateauducipieres.com
       answer: 192.168.200.70
-    - domain: drive.chateauducipieres.com
+    - domain: nextcloud.chateauducipieres.com
       answer: 192.168.200.70
     - domain: adguard.chateauducipieres.com
       answer: 192.168.200.70
