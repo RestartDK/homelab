@@ -232,57 +232,30 @@ services:
       glance.icon: si:portainer
       glance.url: https://portainer.${DOMAIN}
       glance.category: infra
-
-  # db:
-  #   image: mariadb:lts
-  #   container_name: nextcloud_db
-  #   restart: always
-  #   networks:
-  #     - caddynet
-  #   command: --transaction-isolation=READ-COMMITTED
-  #   volumes:
-  #     - db:/var/lib/mysql
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     - MYSQL_ROOT_PASSWORD=${NEXTCLOUD_DB_ROOT_PASSWORD}
-  #     - MYSQL_DATABASE=${NEXTCLOUD_DB_NAME}
-  #     - MYSQL_USER=${NEXTCLOUD_DB_USER}
-  #     - MYSQL_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
-
-  # redis:
-  #   image: redis:alpine
-  #   container_name: nextcloud_redis
-  #   restart: always
-  #   networks:
-  #     - caddynet
-  #   environment:
-  #     - REDIS_HOST=${NEXTCLOUD_REDIS_HOST}
-
-  # nextcloud:
-  #   image: nextcloud
-  #   container_name: nextcloud
-  #   restart: always
-  #   networks:
-  #     - caddynet
-  #   ports:
-  #     - ${NEXTCLOUD_PORT}:${NEXTCLOUD_DOCKER_PORT}
-  #   depends_on:
-  #     - redis
-  #     - db
-  #   volumes:
-  #     - nextcloud:/var/www/html
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     - MYSQL_HOST=${NEXTCLOUD_DB_HOST}
-  #     - MYSQL_DATABASE=${NEXTCLOUD_DB_NAME}
-  #     - MYSQL_USER=${NEXTCLOUD_DB_USER}
-  #     - MYSQL_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
-  #     - REDIS_HOST=${NEXTCLOUD_REDIS_HOST}
-  #     - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_TRUSTED_DOMAINS}
-  #     - NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_ADMIN_USER}
-  #     - NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_ADMIN_PASSWORD}
+  nextcloud:
+    image: ghcr.io/nextcloud-releases/all-in-one:latest
+    restart: unless-stopped
+    container_name: nextcloud-aio-mastercontainer
+    init: true
+    labels:
+      glance.name: Nextcloud
+      glance.icon: si:nextcloud
+      glance.url: https://nextcloud.${DOMAIN}
+      glance.category: productivity
+    security_opt: ["label:disable"]
+    networks:
+      - caddynet
+    env_file:
+      - .env
+    ports:
+      - 8082:8080
+    environment:
+        - APACHE_PORT=11000
+        - APACHE_IP_BINDING=0.0.0.0
+        - SKIP_DOMAIN_VALIDATION=true
+    volumes:
+        - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
+        - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
 
 networks:
   caddynet:
@@ -304,3 +277,5 @@ volumes:
   adguard_config:
   adguard_confdir:
   portainer_data:
+  nextcloud_aio_mastercontainer:
+    external: true
