@@ -80,12 +80,7 @@ prowlarr.{env.DOMAIN} {
 
 # Nextcloud service 
 nextcloud.{env.DOMAIN} {
-	reverse_proxy nextcloud-aio-mastercontainer:8080 {
-		transport http {
-			tls
-			tls_insecure_skip_verify
-		}
-	}
+	reverse_proxy nextcloud-aio-apache:11000
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 	}
