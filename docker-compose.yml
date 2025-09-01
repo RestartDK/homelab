@@ -248,7 +248,7 @@ services:
     env_file:
       - .env
     ports:
-      - 8082:8080
+      - ${NEXTCLOUD_PORT}:${NEXTCLOUD_DOCKER_PORT}
     environment:
         - APACHE_PORT=11000
         - APACHE_IP_BINDING=0.0.0.0
