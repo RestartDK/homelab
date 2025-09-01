@@ -117,7 +117,7 @@ pages:
                 url: https://library.${DOMAIN}
                 icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/komga.svg
               - title: Nextcloud
-                url: https://drive.${DOMAIN}
+                url: https://nextcloud.${DOMAIN}
                 icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/nextcloud.svg
               - title: Radarr
                 url: https://radarr.${DOMAIN}

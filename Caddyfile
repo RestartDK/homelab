@@ -79,8 +79,8 @@ prowlarr.{env.DOMAIN} {
 }
 
 # Nextcloud service 
-drive.{env.DOMAIN} {
-	reverse_proxy nextcloud:{env.NEXTCLOUD_DOCKER_PORT}
+nextcloud.{env.DOMAIN} {
+	reverse_proxy nextcloud-aio-apache:11000
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 	}
