@@ -31,12 +31,13 @@ Fix my server:
   ✔ Run all podman containers and set up dns @done(25-08-28 21:00)
   ✔ Add all adguard rewrites back @done(25-08-28 21:00)
   ✔ Add all portainer configs back @done(25-08-28 21:00)
-  - Fix the monitor on glance @started(25-08-28 21:02)
-  - Fix the docker containers widget on glance
-  - Create glance agent to setup remote server connections
-  - Add nextcloud back onto podman network
+  ✔ Fix the monitor on glance @started(25-08-28 21:02) @done(25-08-28 22:21) @lasted(1h19m54s)
+  ✘ Fix the docker containers widget on glance @cancelled(25-08-28 22:21)
+  ✔ Add nextcloud back onto podman network @started(25-08-28 22:22) @done(25-09-01 04:05) @lasted(3d5h43m54s)
+  - Fix docker socket permissions
   - Add Ollama to portainer
   - Fix ollama portainer agent so we can add it to portainer properly (stop it first it is constantly restarting)
+  - Create glance agent to setup remote server connections
   Setup all media services:
     - Setup Komga
     - Setup Jellyfin
