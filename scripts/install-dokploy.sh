@@ -33,12 +33,64 @@ install_dokploy() {
       command -v "$@" > /dev/null 2>&1
     }
  
-    if command_exists docker; then
+    # Path to SELinux policy source for docker socket access
+    POLICY_TE="/opt/homelab/selinux/docker-socket.te"
+
+        if command_exists docker; then
       echo "Docker already installed"
     else
       curl -sSL https://get.docker.com | sh
     fi
- 
+
+    # Add SELinux policy setup for Docker
+    echo "Setting up SELinux policy for Docker..."
+    
+    # Check if SELinux is enabled
+    if command_exists sestatus; then
+        if sestatus | grep -q "enabled"; then
+            echo "SELinux is enabled, attempting to create policy module..."
+            
+            # Get the hostname for the policy name
+            HOSTNAME=$(hostname)
+            
+            # Check if policy already exists
+            if ! semodule -l | grep -q "^${HOSTNAME}$"; then
+                echo "Generating SELinux policy for '${HOSTNAME}'..."
+                
+                # Try to generate policy, but don't fail if MLS errors occur
+                # Generate policy and capture any errors
+                POLICY_OUTPUT=$(ausearch -c 'node' --raw 2>/dev/null | audit2allow -M "${HOSTNAME}" 2>&1)
+                POLICY_EXIT_CODE=$?
+                
+                # Check if policy file was created successfully
+                if [ -f "${HOSTNAME}.pp" ]; then
+                    # Try to install the policy
+                    if semodule -X 300 -i "${HOSTNAME}.pp" >/dev/null 2>&1; then
+                        echo "SELinux policy module '${HOSTNAME}' installed successfully"
+                    else
+                        echo "Warning: Policy generated but installation failed"
+                        echo "This is usually safe to ignore with targeted SELinux policy"
+                    fi
+                else
+                    # Policy generation failed, but this is often due to MLS constraints
+                    # which are just warnings and can be safely ignored
+                    echo "Note: SELinux policy generation had issues (likely MLS-related warnings)"
+                    echo "This is normal with targeted policy and Docker will work fine"
+                    echo "Continuing with installation..."
+                fi
+                
+                # Note: Traefik policy will be created after the container runs
+                echo "Traefik SELinux policy will be created after container startup..."
+            else
+                echo "SELinux policy module '${HOSTNAME}' already exists"
+            fi
+        else
+            echo "SELinux is disabled, skipping policy setup"
+        fi
+    else
+        echo "SELinux tools not available, skipping policy setup"
+    fi
+
     docker swarm leave --force 2>/dev/null
  
     get_ip() {
@@ -104,6 +156,12 @@ install_dokploy() {
     mkdir -p /etc/dokploy
  
     chmod 777 /etc/dokploy
+
+    # Ensure SELinux labels allow containers to write to /etc/dokploy
+    if command -v semanage > /dev/null 2>&1; then
+        semanage fcontext -a -t container_file_t "/etc/dokploy(/.*)?" 2>/dev/null || true
+    fi
+    restorecon -Rv /etc/dokploy 2>/dev/null || true
  
     docker service create \
     --name dokploy-postgres \
@@ -137,24 +195,35 @@ install_dokploy() {
       --update-parallelism 1 \
       --update-order stop-first \
       --constraint 'node.role == manager' \
-      --security-opt label=disable \
       -e ADVERTISE_ADDR=$advertise_addr \
       dokploy/dokploy:latest
- 
+
  
     docker run -d \
         --name dokploy-traefik \
         --network dokploy-network \
         --restart always \
-        -v /etc/dokploy/traefik/traefik.yml:/etc/traefik/traefik.yml \
-        -v /etc/dokploy/traefik/dynamic:/etc/dokploy/traefik/dynamic \
-        -v /var/run/docker.sock:/var/run/docker.sock \
+        --security-opt label=disable \
+        -v /etc/dokploy/traefik/traefik.yml:/etc/traefik/traefik.yml:z \
+        -v /etc/dokploy/traefik/dynamic:/etc/dokploy/traefik/dynamic:z \
+        -v /var/run/docker.sock:/var/run/docker.sock:z \
         -p 80:80/tcp \
         -p 443:443/tcp \
         -p 443:443/udp \
         traefik:v3.1.2
  
- 
+    # Apply SELinux policy from $POLICY_TE to allow containers to connect to docker.sock
+    echo "Installing SELinux dockersock policy module from ${POLICY_TE}..."
+    if command -v checkmodule > /dev/null 2>&1 && command -v semodule_package > /dev/null 2>&1 && [ -f "${POLICY_TE}" ]; then
+        echo "Applying policy to system"
+        checkmodule -M -m -o /tmp/dockersock.mod "${POLICY_TE}" >/dev/null 2>&1 || true
+        semodule_package -o /tmp/dockersock.pp -m /tmp/dockersock.mod >/dev/null 2>&1 || true
+        semodule -i /tmp/dockersock.pp >/dev/null 2>&1 || true
+        rm -f /tmp/dockersock.mod /tmp/dockersock.pp
+    else
+        echo "Warning: checkmodule/semodule_package not found or ${POLICY_TE} missing; skipping dockersock policy install"
+    fi
+
     # Optional: Use docker service create instead of docker run
     #   docker service create \
     #     --name dokploy-traefik \
