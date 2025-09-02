@@ -35,7 +35,7 @@ Fix my server:
   ✘ Fix the docker containers widget on glance @cancelled(25-08-28 22:21)
   ✔ Add nextcloud back onto podman network @started(25-08-28 22:22) @done(25-09-01 04:05) @lasted(3d5h43m54s)
   ✔ Fix docker socket permissions @started(25-09-01 04:11) @done(25-09-02 17:53) @lasted(1d13h42m44s)
-  - Clean up selinux dokploy installation
+  ✔ Clean up selinux dokploy installation @started(25-09-02 18:19) @done(25-09-02 18:48) @lasted(29m29s)
   - Setup portainer agent again on srv-nana
   - Fix the containers randomly stopping for a problem, maybe caddy or nextcloud
   - Make sure find a solution for nextcloud containers to also start up even if they are not started by master

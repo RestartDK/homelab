@@ -8,15 +8,18 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Check if install script exists
-if [ ! -f "./install-dokploy.sh" ]; then
-    echo "❌ install-dokploy.sh not found in current directory"
+if [ ! -f "$SCRIPT_DIR/install-dokploy.sh" ]; then
+    echo "❌ install-dokploy.sh not found in $SCRIPT_DIR"
     exit 1
 fi
 
 # Check if cleanup script exists
-if [ ! -f "./cleanup-dokploy.sh" ]; then
-    echo "❌ cleanup-dokploy.sh not found in current directory"
+if [ ! -f "$SCRIPT_DIR/cleanup-dokploy.sh" ]; then
+    echo "❌ cleanup-dokploy.sh not found in $SCRIPT_DIR"
     exit 1
 fi
 
@@ -27,7 +30,7 @@ echo "📍 Using advertise address: $ADVERTISE_ADDR"
 # Run cleanup
 echo ""
 echo "🧹 Step 1: Cleaning up existing installation..."
-./cleanup-dokploy.sh
+"$SCRIPT_DIR/cleanup-dokploy.sh"
 
 # Wait a moment for cleanup to complete
 sleep 2
@@ -35,7 +38,7 @@ sleep 2
 # Run installation
 echo ""
 echo "🚀 Step 2: Installing Dokploy fresh..."
-./install-dokploy.sh
+"$SCRIPT_DIR/install-dokploy.sh"
 
 echo ""
 echo "🎉 Dokploy reinstallation completed!"

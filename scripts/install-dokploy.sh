@@ -42,47 +42,31 @@ install_dokploy() {
       curl -sSL https://get.docker.com | sh
     fi
 
-    # Add SELinux policy setup for Docker
-    echo "Setting up SELinux policy for Docker..."
-    
-    # Check if SELinux is enabled
+    # Check if SELinux is enabled and apply policies
     if command_exists sestatus; then
         if sestatus | grep -q "enabled"; then
-            echo "SELinux is enabled, attempting to create policy module..."
+            echo "SELinux is enabled, applying custom policies..."
             
-            # Get the hostname for the policy name
-            HOSTNAME=$(hostname)
-            
-            # Check if policy already exists
-            if ! semodule -l | grep -q "^${HOSTNAME}$"; then
-                echo "Generating SELinux policy for '${HOSTNAME}'..."
-                
-                # Try to generate policy, but don't fail if MLS errors occur
-                # Generate policy and capture any errors
-                POLICY_OUTPUT=$(ausearch -c 'node' --raw 2>/dev/null | audit2allow -M "${HOSTNAME}" 2>&1)
-                POLICY_EXIT_CODE=$?
-                
-                # Check if policy file was created successfully
-                if [ -f "${HOSTNAME}.pp" ]; then
-                    # Try to install the policy
-                    if semodule -X 300 -i "${HOSTNAME}.pp" >/dev/null 2>&1; then
-                        echo "SELinux policy module '${HOSTNAME}' installed successfully"
-                    else
-                        echo "Warning: Policy generated but installation failed"
-                        echo "This is usually safe to ignore with targeted SELinux policy"
-                    fi
-                else
-                    # Policy generation failed, but this is often due to MLS constraints
-                    # which are just warnings and can be safely ignored
-                    echo "Note: SELinux policy generation had issues (likely MLS-related warnings)"
-                    echo "This is normal with targeted policy and Docker will work fine"
-                    echo "Continuing with installation..."
-                fi
-                
-                # Note: Traefik policy will be created after the container runs
-                echo "Traefik SELinux policy will be created after container startup..."
+            # Apply SELinux policy from $POLICY_TE to allow containers to connect to docker.sock
+            echo "Installing SELinux dockersock policy module from ${POLICY_TE}..."
+            if command -v checkmodule > /dev/null 2>&1 && command -v semodule_package > /dev/null 2>&1 && [ -f "${POLICY_TE}" ]; then
+                echo "Applying docker socket policy to system"
+                checkmodule -M -m -o /tmp/dockersock.mod "${POLICY_TE}" >/dev/null 2>&1 || true
+                semodule_package -o /tmp/dockersock.pp -m /tmp/dockersock.mod >/dev/null 2>&1 || true
+                semodule -i /tmp/dockersock.pp >/dev/null 2>&1 || true
+                rm -f /tmp/dockersock.mod /tmp/dockersock.pp
+                echo "Docker socket policy installed successfully"
             else
-                echo "SELinux policy module '${HOSTNAME}' already exists"
+                echo "Warning: checkmodule/semodule_package not found or ${POLICY_TE} missing; skipping dockersock policy install"
+            fi
+            
+            # Ensure SELinux labels allow containers to write to /etc/dokploy
+            echo "Setting up file context labels for /etc/dokploy..."
+            if command -v semanage > /dev/null 2>&1; then
+                semanage fcontext -a -t container_file_t "/etc/dokploy(/.*)?" 2>/dev/null || true
+                echo "File context labels configured"
+            else
+                echo "Warning: semanage not found; skipping file context setup"
             fi
         else
             echo "SELinux is disabled, skipping policy setup"
@@ -157,11 +141,10 @@ install_dokploy() {
  
     chmod 777 /etc/dokploy
 
-    # Ensure SELinux labels allow containers to write to /etc/dokploy
-    if command -v semanage > /dev/null 2>&1; then
-        semanage fcontext -a -t container_file_t "/etc/dokploy(/.*)?" 2>/dev/null || true
+    # Apply file context labels if SELinux is enabled
+    if command_exists sestatus && sestatus | grep -q "enabled"; then
+        restorecon -Rv /etc/dokploy 2>/dev/null || true
     fi
-    restorecon -Rv /etc/dokploy 2>/dev/null || true
  
     docker service create \
     --name dokploy-postgres \
@@ -212,31 +195,8 @@ install_dokploy() {
         -p 443:443/udp \
         traefik:v3.1.2
  
-    # Apply SELinux policy from $POLICY_TE to allow containers to connect to docker.sock
-    echo "Installing SELinux dockersock policy module from ${POLICY_TE}..."
-    if command -v checkmodule > /dev/null 2>&1 && command -v semodule_package > /dev/null 2>&1 && [ -f "${POLICY_TE}" ]; then
-        echo "Applying policy to system"
-        checkmodule -M -m -o /tmp/dockersock.mod "${POLICY_TE}" >/dev/null 2>&1 || true
-        semodule_package -o /tmp/dockersock.pp -m /tmp/dockersock.mod >/dev/null 2>&1 || true
-        semodule -i /tmp/dockersock.pp >/dev/null 2>&1 || true
-        rm -f /tmp/dockersock.mod /tmp/dockersock.pp
-    else
-        echo "Warning: checkmodule/semodule_package not found or ${POLICY_TE} missing; skipping dockersock policy install"
-    fi
 
-    # Optional: Use docker service create instead of docker run
-    #   docker service create \
-    #     --name dokploy-traefik \
-    #     --constraint 'node.role==manager' \
-    #     --network dokploy-network \
-    #     --mount type=bind,source=/etc/dokploy/traefik/traefik.yml,target=/etc/traefik/traefik.yml \
-    #     --mount type=bind,source=/etc/dokploy/traefik/dynamic,target=/etc/dokploy/traefik/dynamic \
-    #     --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
-    #     --publish mode=host,published=443,target=443 \
-    #     --publish mode=host,published=80,target=80 \
-    #     --publish mode=host,published=443,target=443,protocol=udp \
-    #     traefik:v3.1.2
- 
+
     GREEN="\033[0;32m"
     YELLOW="\033[1;33m"
     BLUE="\033[0;34m"
