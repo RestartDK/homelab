@@ -8,7 +8,7 @@ dashboard.{env.DOMAIN} {
 
 # Dokploy UI (remote server)
 dokploy.{env.DOMAIN} {
-	reverse_proxy host.docker.internal:{env.DOKPLOY_UI_PORT}
+	reverse_proxy dokploy:{env.DOKPLOY_UI_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 	}
