@@ -233,6 +233,33 @@ services:
       glance.icon: si:portainer
       glance.url: https://portainer.${DOMAIN}
       glance.category: infra
+  # TODO: Add open webui here with the model dir correctly
+  # open-webui:
+  #   container_name: open-webui
+  #   image: ghcr.io/open-webui/open-webui:main
+  #   environment:
+  #     - MODEL_DOWNLOAD_DIR=/models
+  #     - OLLAMA_API_URL=http://ollama.chateauducipieres.com
+  #     - LOG_LEVEL=debug
+  #     - WEBUI_SECRET_KEY=your_secret_key_here # TODO: not added here
+  #   volumes:
+  #     - data:/data
+  #     - models:/models
+  #     - open-webui:/app/backend/data
+  #   ports:
+  #     - "8080:8080"
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       max-size: "5m"
+  #       max-file: "2"
+  #   depends_on:
+  #     - ollama
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway"
+  #   networks:
+  #     - nana-net
+  #   restart: unless-stopped
   nextcloud:
     image: ghcr.io/nextcloud-releases/all-in-one:latest
     restart: unless-stopped
