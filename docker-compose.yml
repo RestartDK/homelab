@@ -50,6 +50,7 @@ services:
     extra_hosts:
          - host.docker.internal:host-gateway
          - ollama:${OLLAMA_HOST}
+         - dokploy:${DOKPLOY_HOST}
 
   adguardhome:  
     image: adguard/adguardhome  
