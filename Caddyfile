@@ -31,7 +31,7 @@ library.{env.DOMAIN} {
 }
 
 # Jellyfin service
-media.{env.DOMAIN} {
+jellyfin.{env.DOMAIN} {
 	reverse_proxy jellyfin:{env.JELLYFIN_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
@@ -102,6 +102,14 @@ portainer.{env.DOMAIN} {
 			tls_insecure_skip_verify
 		}
 	}
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+}
+
+# qBittorrent service
+qbittorrent.{env.DOMAIN} {
+	reverse_proxy qbittorrent:{env.QBITTORRENT_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 	}

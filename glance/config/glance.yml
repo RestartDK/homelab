@@ -105,7 +105,7 @@ pages:
             title: Services
             sites:
               - title: Jellyfin
-                url: https://media.${DOMAIN}
+                url: https://jellyfin.${DOMAIN}
                 icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/jellyfin.svg
               - title: Portainer
                 url: https://portainer.${DOMAIN}
@@ -125,6 +125,9 @@ pages:
               - title: Sonarr
                 url: https://sonarr.${DOMAIN}
                 icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/sonarr.svg
+              - title: Qbittorrent
+                url: https://qbittorrent.${DOMAIN}
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/qbittorrent.svg
               - title: Suwayomi
                 url: https://manga.${DOMAIN}
                 icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/suwayomi.svg
