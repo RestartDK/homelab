@@ -159,7 +159,7 @@ filtering:
       answer: 192.168.200.70
     - domain: library.chateauducipieres.com
       answer: 192.168.200.70
-    - domain: media.chateauducipieres.com
+    - domain: jellyfin.chateauducipieres.com
       answer: 192.168.200.70
     - domain: jellyseerr.chateauducipieres.com
       answer: 192.168.200.70
@@ -170,6 +170,8 @@ filtering:
     - domain: sonarr.chateauducipieres.com
       answer: 192.168.200.70
     - domain: prowlarr.chateauducipieres.com
+      answer: 192.168.200.70
+    - domain: qbittorrent.chateauducipieres.com
       answer: 192.168.200.70
     - domain: nextcloud.chateauducipieres.com
       answer: 192.168.200.70
