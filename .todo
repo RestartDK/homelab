@@ -36,20 +36,23 @@ Fix my server:
   ✔ Add nextcloud back onto podman network @started(25-08-28 22:22) @done(25-09-01 04:05) @lasted(3d5h43m54s)
   ✔ Fix docker socket permissions @started(25-09-01 04:11) @done(25-09-02 17:53) @lasted(1d13h42m44s)
   ✔ Clean up selinux dokploy installation @started(25-09-02 18:19) @done(25-09-02 18:48) @lasted(29m29s)
-  - Setup portainer agent again on srv-nana
-  - Fix the containers randomly stopping for a problem, maybe caddy or nextcloud
-  - Make sure find a solution for nextcloud containers to also start up even if they are not started by master
-  - Try to download cup container again, but try with security label off to allow for socket access
-  - Add Ollama to portainer
-  - Fix ollama portainer agent so we can add it to portainer properly (stop it first it is constantly restarting)
-  - Create glance agent to setup remote server connections
+  ✔ Setup portainer agent again on srv-nana @done(25-09-02 22:28)
+  ✔ Fix the containers randomly stopping for a problem, maybe caddy or nextcloud @started(25-09-02 22:28) @done(25-09-03 01:28) @lasted(3h14s)
+  ✔ Make sure find a solution for nextcloud containers to also start up even if they are not started by master @done(25-09-04 00:07)
+  ✔ Add Ollama to portainer @done(25-09-04 00:07)
+  ✔ Fix ollama portainer agent so we can add it to portainer properly (stop it first it is constantly restarting) @done(25-09-04 00:07)
+  ✔ Fix podman compose going down randomly @done(25-09-04 00:09)
   Setup all media services:
-    - Setup Komga
-    - Setup Jellyfin
-    - Setup Sonarr
-    - Setup Radarr
-    - Setup Prowlarr
+    ✔ Setup Komga @done(25-09-04 00:07)
+    ✔ Setup Jellyfin @done(25-09-04 00:08)
+    ✔ Setup Sonarr @done(25-09-04 00:08)
+    ✔ Setup Radarr @done(25-09-04 00:08)
+    ✔ Setup Prowlarr @done(25-09-04 00:08)
+  Setup digi lib:
     - Find a manga downloader (suwayomi if it can work)
-  - Fix podman compose going down randomly
+    - Fix komga to work with manga downloader
+    - Add manga client on ios from komga server
+  - Create glance agent with go to setup remote server connections
+  - Try to download cup container again, but try with security label off to allow for socket access
   - Add grafana for data monitoring
   - Add gh self hosted runner to machine 2
