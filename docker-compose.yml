@@ -112,14 +112,9 @@ services:
       - caddynet
     env_file:
       - .env
-    environment:
-      - KOMGA_PORT=${KOMGA_PORT}
-      - KOMGA_DOCKER_PORT=${KOMGA_DOCKER_PORT}
-      - KOMGA_PATH=${KOMGA_PATH}
-      - BOOKS_PATH=${BOOKS_PATH}
     volumes:
       - komga_config:/config:Z
-      - komga_data:/data:Z
+      - media_manga:/data:z
     ports:
       - ${KOMGA_PORT}:${KOMGA_DOCKER_PORT}
 
@@ -128,7 +123,7 @@ services:
     container_name: jellyfin
     restart: "unless-stopped"
     user: "1000:1000"
-    userns_mode: "keep-id"
+    userns_mode: "keep-id:uid=1000,gid=1000"
     labels:
       glance.name: Jellyfin
       glance.icon: si:jellyfin
@@ -141,7 +136,8 @@ services:
     volumes:
       - jellyfin_config:/config:Z
       - jellyfin_cache:/cache:Z
-      - media_data:/media:z
+      - media_movies:/movies:z
+      - media_tvshows:/tvshows:z
     ports:
       - ${JELLYFIN_PORT}:${JELLYFIN_DOCKER_PORT}
 
@@ -150,7 +146,7 @@ services:
     container_name: radarr
     restart: unless-stopped
     user: "1000:1000"
-    userns_mode: "keep-id"
+    userns_mode: "keep-id:uid=1000,gid=1000"
     labels:
       glance.name: Radarr
       glance.icon: si:radarr
@@ -160,7 +156,7 @@ services:
       - caddynet
     volumes:
       - radarr_config:/config:Z
-      - media_data:/data:z
+      - media_movies:/data:z
       - media_downloads:/downloads:z
     ports:
       - ${RADARR_PORT}:${RADARR_DOCKER_PORT}
@@ -170,7 +166,7 @@ services:
     container_name: sonarr
     restart: unless-stopped
     user: "1000:1000"
-    userns_mode: "keep-id"
+    userns_mode: "keep-id:uid=1000,gid=1000"
     labels:
       glance.name: Sonarr
       glance.icon: si:sonarr
@@ -180,7 +176,7 @@ services:
       - caddynet
     volumes:
       - sonarr_config:/config:Z
-      - media_data:/data:z
+      - media_tvshows:/data:z
       - media_downloads:/downloads:z
     ports:
       - ${SONARR_PORT}:${SONARR_DOCKER_PORT}
@@ -190,7 +186,7 @@ services:
     container_name: prowlarr
     restart: unless-stopped
     user: "1000:1000"
-    userns_mode: "keep-id"
+    userns_mode: "keep-id:uid=1000,gid=1000"
     labels:
       glance.name: Prowlarr
       glance.icon: si:prowlarr
@@ -209,7 +205,7 @@ services:
     container_name: qbittorrent
     restart: unless-stopped
     user: "1000:1000"
-    userns_mode: "keep-id"
+    userns_mode: "keep-id:uid=1000,gid=1000"
     labels:
       glance.name: qBittorrent
       glance.icon: si:qbittorrent
@@ -341,7 +337,6 @@ networks:
 volumes:
   caddy_data:
   caddy_config:
-  komga_data:
   komga_config:
   jellyfin_config:
   jellyfin_cache:
@@ -354,8 +349,12 @@ volumes:
   db:
   adguard_config:
   adguard_confdir:
+  media_manga:
+    external: true
   portainer_data:
-  media_data:
+  media_movies:
+    external: true
+  media_tvshows:
     external: true
   media_downloads:
     external: true
