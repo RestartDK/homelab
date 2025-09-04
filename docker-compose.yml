@@ -347,6 +347,19 @@ services:
     volumes:
         - nextcloud_aio_mastercontainer:/mnt/docker-aio-config:Z
         - /run/user/1000/podman/podman.sock:/var/run/docker.sock:Z
+  couchdb:
+    image: couchdb:latest
+    container_name: couchdb-for-ols
+    user: 5984:5984
+    environment:
+      - COUCHDB_USER=${COUCHDB_USER}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
+    volumes:
+      - couchdb_data:/opt/couchdb/data:Z
+      - couchdb_config:/opt/couchdb/etc/local.d:Z
+    ports:
+      - 5984:5984
+    restart: unless-stopped
 
 networks:
   caddynet:
@@ -379,3 +392,5 @@ volumes:
     external: true
   nextcloud_aio_mastercontainer:
     external: true
+  couchdb_data:
+  couchdb_config:

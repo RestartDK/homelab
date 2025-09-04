@@ -115,6 +115,14 @@ qbittorrent.{env.DOMAIN} {
 	}
 }
 
+# CouchDB service (for Obsidian Live Sync)
+couchdb.{env.DOMAIN} {
+	reverse_proxy couchdb-for-ols:5984
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+}
+
 # Cockpit (proxy to host)
 admin.{env.DOMAIN} {
 	reverse_proxy host.docker.internal:{env.COCKPIT_PORT} {
