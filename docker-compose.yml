@@ -102,11 +102,13 @@ services:
   komga:
     image: gotson/komga
     container_name: komga
+    user: 1000:1000
+    userns_mode: "keep-id:uid=1000,gid=1000"
     restart: unless-stopped
     labels:
       glance.name: Komga
       glance.icon: si:komga
-      glance.url: https://library.${DOMAIN}
+      glance.url: https://komga.${DOMAIN}
       glance.category: media
     networks:
       - caddynet
@@ -117,6 +119,22 @@ services:
       - media_manga:/data:z
     ports:
       - ${KOMGA_PORT}:${KOMGA_DOCKER_PORT}
+
+  suwayomi:
+    image: ghcr.io/suwayomi/suwayomi-server:stable
+    container_name: suwayomi
+    user: 1000:1000
+    userns_mode: "keep-id:uid=1000,gid=1000"
+    restart: on-failure:3
+    networks:
+      - caddynet
+    environment:
+      - TZ=Etc/UTC 
+    volumes:
+      - media_manga:/home/suwayomi/.local/share/Tachidesk/downloads:z
+      - suwayomi_config:/home/suwayomi/.local/share/Tachidesk:z
+    ports:
+      - "4567:4567"
 
   jellyfin:
     image: jellyfin/jellyfin
@@ -338,6 +356,7 @@ volumes:
   caddy_data:
   caddy_config:
   komga_config:
+  suwayomi_config:
   jellyfin_config:
   jellyfin_cache:
   jellyseerr_config:

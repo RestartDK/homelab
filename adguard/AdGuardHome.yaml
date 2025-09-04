@@ -157,13 +157,13 @@ filtering:
       answer: 192.168.200.70
     - domain: admin.chateauducipieres.com
       answer: 192.168.200.70
-    - domain: library.chateauducipieres.com
+    - domain: komga.chateauducipieres.com
       answer: 192.168.200.70
     - domain: jellyfin.chateauducipieres.com
       answer: 192.168.200.70
     - domain: jellyseerr.chateauducipieres.com
       answer: 192.168.200.70
-    - domain: manga.chateauducipieres.com
+    - domain: suwayomi.chateauducipieres.com
       answer: 192.168.200.70
     - domain: radarr.chateauducipieres.com
       answer: 192.168.200.70

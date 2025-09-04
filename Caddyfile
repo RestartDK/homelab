@@ -23,7 +23,7 @@ ollama.{env.DOMAIN} {
 }
 
 # Komga service
-library.{env.DOMAIN} {
+komga.{env.DOMAIN} {
 	reverse_proxy komga:{env.KOMGA_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
@@ -63,7 +63,7 @@ sonarr.{env.DOMAIN} {
 }
 
 # Suwayomi service
-manga.{env.DOMAIN} {
+suwayomi.{env.DOMAIN} {
 	reverse_proxy suwayomi:{env.SUWAYOMI_DOCKER_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
