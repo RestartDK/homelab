@@ -1,5 +1,39 @@
+version: '3.9'
+
 name: homelab
+
+x-podman:
+  in_pod: false
+
 services:
+  adguardhome:  
+    image: adguard/adguardhome  
+    container_name: adguardhome  
+    restart: unless-stopped  
+    labels:
+      glance.name: AdGuard Home
+      glance.icon: si:adguard
+      glance.url: https://adguard.${DOMAIN}
+      glance.category: infra
+    networks:
+      - caddynet
+    env_file:
+      - .env
+    ports:  
+      # Expose port 53 on TCP and UDP for DNS queries
+      - "${ADGUARD_DNS_PORT}:${ADGUARD_DOCKER_DNS_PORT}/tcp"
+      - "${ADGUARD_DNS_PORT}:${ADGUARD_DOCKER_DNS_PORT}/udp"
+
+      # Expose port 80 on TCP for HTTP web interface
+      - "${ADGUARD_HTTP_PORT}:${ADGUARD_DOCKER_HTTP_PORT}/tcp"
+
+      # Expose port 3000 on TCP for AdGuard Home's API
+      - "${ADGUARD_API_PORT}:${ADGUARD_DOCKER_API_PORT}/tcp"
+
+    volumes:  
+      - adguard_config:/opt/adguardhome/work:Z  
+      - $PWD/adguard:/opt/adguardhome/conf:Z
+
   caddy:
     container_name: caddy
     hostname: caddy
@@ -51,36 +85,6 @@ services:
          - host.docker.internal:host-gateway
          - ollama:${OLLAMA_HOST}
          - dokploy:${DOKPLOY_HOST}
-
-  adguardhome:  
-    image: adguard/adguardhome  
-    container_name: adguardhome  
-    restart: unless-stopped  
-    labels:
-      glance.name: AdGuard Home
-      glance.icon: si:adguard
-      glance.url: https://adguard.${DOMAIN}
-      glance.category: infra
-    networks:
-      - caddynet
-    env_file:
-      - .env
-    ports:  
-      # Expose port 53 on TCP and UDP for DNS queries
-      - "${ADGUARD_DNS_PORT}:${ADGUARD_DOCKER_DNS_PORT}/tcp"
-      - "${ADGUARD_DNS_PORT}:${ADGUARD_DOCKER_DNS_PORT}/udp"
-
-      # Expose port 80 on TCP for HTTP web interface
-      - "${ADGUARD_HTTP_PORT}:${ADGUARD_DOCKER_HTTP_PORT}/tcp"
-
-      # Expose port 3000 on TCP for AdGuard Home's API
-      - "${ADGUARD_API_PORT}:${ADGUARD_DOCKER_API_PORT}/tcp"
-
-    volumes:  
-      - adguard_config:/opt/adguardhome/work:Z  
-      - $PWD/adguard:/opt/adguardhome/conf:Z
-
-
   glance:
     image: glanceapp/glance
     container_name: glance
@@ -92,7 +96,6 @@ services:
     volumes:
       - ${GLANCE_PATH}/config:/app/config:Z
       - ${ASSETS_PATH}:/app/assets:Z
-      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:z
     ports:
       - ${GLANCE_PORT}:${GLANCE_DOCKER_PORT}
 
@@ -109,14 +112,9 @@ services:
       - caddynet
     env_file:
       - .env
-    environment:
-      - KOMGA_PORT=${KOMGA_PORT}
-      - KOMGA_DOCKER_PORT=${KOMGA_DOCKER_PORT}
-      - KOMGA_PATH=${KOMGA_PATH}
-      - BOOKS_PATH=${BOOKS_PATH}
     volumes:
       - komga_config:/config:Z
-      - komga_data:/data:Z
+      - media_manga:/data:z
     ports:
       - ${KOMGA_PORT}:${KOMGA_DOCKER_PORT}
 
@@ -124,10 +122,12 @@ services:
     image: jellyfin/jellyfin
     container_name: jellyfin
     restart: "unless-stopped"
+    user: "1000:1000"
+    userns_mode: "keep-id:uid=1000,gid=1000"
     labels:
       glance.name: Jellyfin
       glance.icon: si:jellyfin
-      glance.url: https://media.${DOMAIN}
+      glance.url: https://jellyfin.${DOMAIN}
       glance.category: media
     networks:
       - caddynet
@@ -136,14 +136,105 @@ services:
     volumes:
       - jellyfin_config:/config:Z
       - jellyfin_cache:/cache:Z
-      - ${MEDIA_PATH}:/media:Z
+      - media_movies:/movies:z
+      - media_tvshows:/tvshows:z
     ports:
       - ${JELLYFIN_PORT}:${JELLYFIN_DOCKER_PORT}
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    user: "1000:1000"
+    userns_mode: "keep-id:uid=1000,gid=1000"
+    labels:
+      glance.name: Radarr
+      glance.icon: si:radarr
+      glance.url: https://radarr.${DOMAIN}
+      glance.category: media
+    networks:
+      - caddynet
+    volumes:
+      - radarr_config:/config:Z
+      - media_movies:/data:z
+      - media_downloads:/downloads:z
+    ports:
+      - ${RADARR_PORT}:${RADARR_DOCKER_PORT}
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    user: "1000:1000"
+    userns_mode: "keep-id:uid=1000,gid=1000"
+    labels:
+      glance.name: Sonarr
+      glance.icon: si:sonarr
+      glance.url: https://sonarr.${DOMAIN}
+      glance.category: media
+    networks:
+      - caddynet
+    volumes:
+      - sonarr_config:/config:Z
+      - media_tvshows:/data:z
+      - media_downloads:/downloads:z
+    ports:
+      - ${SONARR_PORT}:${SONARR_DOCKER_PORT}
+  
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    user: "1000:1000"
+    userns_mode: "keep-id:uid=1000,gid=1000"
+    labels:
+      glance.name: Prowlarr
+      glance.icon: si:prowlarr
+      glance.url: https://prowlarr.${DOMAIN}
+      glance.category: media
+    networks:
+      - caddynet
+    volumes:
+      - prowlarr_config:/config:Z
+      - media_downloads:/downloads:z
+    ports:
+      - ${PROWLARR_PORT}:${PROWLARR_DOCKER_PORT}
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+    user: "1000:1000"
+    userns_mode: "keep-id:uid=1000,gid=1000"
+    labels:
+      glance.name: qBittorrent
+      glance.icon: si:qbittorrent
+      glance.url: https://qbittorrent.${DOMAIN}
+      glance.category: media
+    networks:
+      - caddynet
+    env_file:
+      - .env
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - WEBUI_PORT=${QBITTORRENT_DOCKER_PORT}
+      - TORRENTING_PORT=${QBITTORRENT_TORRENT_PORT}
+    volumes:
+      - qbittorrent_config:/config:Z
+      - media_downloads:/downloads:z
+    ports:
+      - ${QBITTORRENT_PORT}:${QBITTORRENT_DOCKER_PORT}
+      - ${QBITTORRENT_TORRENT_PORT}:${QBITTORRENT_TORRENT_PORT}
+      - ${QBITTORRENT_TORRENT_PORT}:${QBITTORRENT_TORRENT_PORT}/udp
 
   jellyseerr:
     image: fallenbagel/jellyseerr
     container_name: jellyseerr
     restart: unless-stopped
+    # user: "1000:1000"
+    # userns_mode: "keep-id"
     labels:
       glance.name: Jellyseerr
       glance.icon: si:jellyseerr
@@ -165,56 +256,6 @@ services:
       interval: 15s
       retries: 3
 
-  radarr:
-    image: lscr.io/linuxserver/radarr:latest
-    container_name: radarr
-    restart: unless-stopped
-    labels:
-      glance.name: Radarr
-      glance.icon: si:radarr
-      glance.url: https://radarr.${DOMAIN}
-      glance.category: media
-    networks:
-      - caddynet
-    volumes:
-      - radarr_config:/config:Z
-      - ${DATA_PATH}:/data:Z
-    ports:
-      - ${RADARR_PORT}:${RADARR_DOCKER_PORT}
-
-  sonarr:
-    image: lscr.io/linuxserver/sonarr:latest
-    container_name: sonarr
-    restart: unless-stopped
-    labels:
-      glance.name: Sonarr
-      glance.icon: si:sonarr
-      glance.url: https://sonarr.${DOMAIN}
-      glance.category: media
-    networks:
-      - caddynet
-    volumes:
-      - sonarr_config:/config:Z
-      - ${DATA_PATH}:/data:Z
-    ports:
-      - ${SONARR_PORT}:${SONARR_DOCKER_PORT}
-  
-  prowlarr:
-      image: lscr.io/linuxserver/prowlarr:latest
-      container_name: prowlarr
-      restart: unless-stopped
-      labels:
-        glance.name: Prowlarr
-        glance.icon: si:prowlarr
-        glance.url: https://prowlarr.${DOMAIN}
-        glance.category: media
-      networks:
-        - caddynet
-      volumes:
-        - prowlarr_config:/config:Z
-      ports:
-        - ${PROWLARR_PORT}:${PROWLARR_DOCKER_PORT}
-
   portainer:
     image: portainer/portainer-ce:lts
     container_name: portainer
@@ -222,11 +263,13 @@ services:
     privileged: true
     networks:
       - caddynet
+    security_opt:
+      - label=disable
     ports:
       - "8000:8000"
       - "9443:9443"
     volumes:
-      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:z
+      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:Z
       - portainer_data:/data
     labels:
       glance.name: Portainer
@@ -270,7 +313,8 @@ services:
       glance.icon: si:nextcloud
       glance.url: https://nextcloud.${DOMAIN}
       glance.category: productivity
-    security_opt: ["label:disable"]
+    security_opt: 
+      - label=disable
     networks:
       - caddynet
     env_file:
@@ -283,8 +327,8 @@ services:
         - SKIP_DOMAIN_VALIDATION=true
         - APACHE_ADDITIONAL_NETWORK=caddynet
     volumes:
-        - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
-        - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
+        - nextcloud_aio_mastercontainer:/mnt/docker-aio-config:Z
+        - /run/user/1000/podman/podman.sock:/var/run/docker.sock:Z
 
 networks:
   caddynet:
@@ -293,7 +337,6 @@ networks:
 volumes:
   caddy_data:
   caddy_config:
-  komga_data:
   komga_config:
   jellyfin_config:
   jellyfin_cache:
@@ -301,10 +344,19 @@ volumes:
   radarr_config:
   sonarr_config:
   prowlarr_config:
+  qbittorrent_config:
   nextcloud:
   db:
   adguard_config:
   adguard_confdir:
+  media_manga:
+    external: true
   portainer_data:
+  media_movies:
+    external: true
+  media_tvshows:
+    external: true
+  media_downloads:
+    external: true
   nextcloud_aio_mastercontainer:
     external: true
