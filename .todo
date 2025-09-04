@@ -52,8 +52,9 @@ Fix my server:
     ✔ Find a manga downloader (suwayomi if it can work) @done(25-09-04 17:00)
     ✔ Fix komga to work with manga downloader @done(25-09-04 17:00)
     ✔ Add manga client on ios from komga server @done(25-09-04 17:00)
-  - Test containers if you need both user and userns in compose
+  - Add obsidian live sync server @started(25-09-04 21:09)
   - Create glance agent with go to setup remote server connections
+  - Test containers if you need both user and userns in compose
   - Setup ollama models on srv-nana and test with raycast ai
   - Fix open web ui to work
   - Try to download cup container again, but try with security label off to allow for socket access
