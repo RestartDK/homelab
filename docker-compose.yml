@@ -44,9 +44,9 @@ services:
     networks:
       - caddynet
     ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
+      - "${CADDY_HTTP_PORT}:${CADDY_DOCKER_HTTP_PORT}"
+      - "${CADDY_HTTPS_PORT}:${CADDY_DOCKER_HTTPS_PORT}"
+      - "${CADDY_HTTPS_PORT}:${CADDY_DOCKER_HTTPS_PORT}/udp"
     env_file:
       - .env
     environment:
@@ -134,7 +134,7 @@ services:
       - media_manga:/home/suwayomi/.local/share/Tachidesk/downloads:z
       - suwayomi_config:/home/suwayomi/.local/share/Tachidesk:z
     ports:
-      - "4567:4567"
+      - ${SUWAYOMI_PORT}:${SUWAYOMI_DOCKER_PORT}
 
   jellyfin:
     image: jellyfin/jellyfin
@@ -284,8 +284,8 @@ services:
     security_opt:
       - label=disable
     ports:
-      - "8000:8000"
-      - "9443:9443"
+      - ${PORTAINER_HTTP_PORT}:${PORTAINER_HTTP_DOCKER_PORT}
+      - ${PORTAINER_HTTPS_PORT}:${PORTAINER_HTTPS_DOCKER_PORT}
     volumes:
       - /run/user/1000/podman/podman.sock:/var/run/docker.sock:Z
       - portainer_data:/data
@@ -358,7 +358,7 @@ services:
       - couchdb_data:/opt/couchdb/data:Z
       - couchdb_config:/opt/couchdb/etc/local.d:Z
     ports:
-      - 5984:5984
+      - ${COUCHDB_PORT}:${COUCHDB_DOCKER_PORT}
     restart: unless-stopped
 
 networks:
