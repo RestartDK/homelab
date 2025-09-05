@@ -156,6 +156,8 @@ services:
       - jellyfin_cache:/cache:Z
       - media_movies:/movies:z
       - media_tvshows:/tvshows:z
+    devices: 
+      - nvidia.com/gpu=0
     ports:
       - ${JELLYFIN_PORT}:${JELLYFIN_DOCKER_PORT}
 
