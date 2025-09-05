@@ -146,6 +146,9 @@ pages:
               - title: Ollama
                 url: https://ollama.${DOMAIN}
                 icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/ollama.svg
+              - title: CouchDB
+                url: https://couchdb.${DOMAIN}
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/couchdb.svg
 
       - size: small
         widgets:
