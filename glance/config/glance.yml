@@ -97,7 +97,7 @@ pages:
                     hide: false
               - type: remote
                 name: "srv-nana"
-                url: http://${OLLAMA_HOST}
+                url: http://${OLLAMA_HOST}:8080
       - size: full
         widgets:
           - type: monitor

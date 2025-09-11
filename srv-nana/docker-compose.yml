@@ -16,6 +16,16 @@ services:
     restart: always
     networks:
       - nana-net
+  server-status:
+    image: restartdk/glance-server-status:latest
+    container_name: server-status
+    restart: unless-stopped
+    cap_add:
+      - SYS_ADMIN
+    volumes:
+      - /sys:/sys:ro
+    ports:
+      - "8080:8080"
 
 
 volumes:
