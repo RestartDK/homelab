@@ -54,9 +54,10 @@ Fix my server:
     ✔ Add manga client on ios from komga server @done(25-09-04 17:00)
   ✔ Add obsidian live sync server @started(25-09-04 21:09) @done(25-09-05 00:38) @lasted(3h29m55s)
   ✔ Add ports with .env @started(25-09-05 00:39) @done(25-09-05 00:48) @lasted(9m27s)
-  - Create glance agent with go to setup remote server connections
-  - Test containers if you need both user and userns in compose
+  ✔ Create glance agent with go to setup remote server connections @started(25-09-06 00:18) @done(25-09-12 00:32) @lasted(6d14m40s)
+  - Write docs for homelab
   - Setup ollama models on srv-nana and test with raycast ai
+  - Test containers if you need both user and userns in compose
   - Fix open web ui to work
   - Try to download cup container again, but try with security label off to allow for socket access
   - Split up compose files to separate folders and make a main compose file to spin up services
