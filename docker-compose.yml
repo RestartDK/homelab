@@ -362,6 +362,15 @@ services:
     ports:
       - ${COUCHDB_PORT}:${COUCHDB_DOCKER_PORT}
     restart: unless-stopped
+  
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "${GRAFANA_PORT}:${GRAFANA_DOCKER_PORT}"
+    volumes:
+      - grafana_storage:/var/lib/grafana
 
 networks:
   caddynet:
@@ -396,3 +405,4 @@ volumes:
     external: true
   couchdb_data:
   couchdb_config:
+  grafana_storage:
