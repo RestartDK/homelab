@@ -149,6 +149,9 @@ pages:
               - title: CouchDB
                 url: https://couchdb.${DOMAIN}
                 icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/couchdb.svg
+              - title: Grafana
+                url: https://grafana.${DOMAIN}
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/grafana.svg
 
       - size: small
         widgets:

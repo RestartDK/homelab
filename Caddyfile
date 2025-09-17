@@ -123,6 +123,14 @@ couchdb.{env.DOMAIN} {
 	}
 }
 
+# Grafana service
+grafana.{env.DOMAIN} {
+	reverse_proxy grafana:{env.GRAFANA_DOCKER_PORT}
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+}
+
 # Cockpit (proxy to host)
 admin.{env.DOMAIN} {
 	reverse_proxy host.docker.internal:{env.COCKPIT_PORT} {
