@@ -80,7 +80,14 @@ sudo systemctl enable --now opencode-web.service
 ```bash
 sudo systemctl status opencode-web.service
 source /etc/opencode/opencode-web.env
-curl -u "${OPENCODE_SERVER_USERNAME}:${OPENCODE_SERVER_PASSWORD}" "http://127.0.0.1:${OPENCODE_PORT}/global/health"
+curl "http://127.0.0.1:${OPENCODE_PORT}/global/health"
+```
+
+If you also want OpenCode's built-in basic auth, add these optional variables to `/etc/opencode/opencode-web.env` and restart the service:
+
+```bash
+OPENCODE_SERVER_USERNAME=opencode
+OPENCODE_SERVER_PASSWORD=change-me
 ```
 
 4. Add the remote proxy settings to `/opt/homelab/.env` on `srv-hatchi`:
@@ -140,7 +147,7 @@ docker stack deploy -c portainer-agent-stack.yml portainer
 - **Port**: `4096`
 - **Bind address**: `0.0.0.0`
 - **Working directory**: `/home/dkumlin/Projects`
-- **Auth**: HTTP basic auth via `OPENCODE_SERVER_USERNAME` and `OPENCODE_SERVER_PASSWORD`
+- **Auth**: Optional HTTP basic auth via `OPENCODE_SERVER_USERNAME` and `OPENCODE_SERVER_PASSWORD`
 - **Public URL**: `https://opencode.${DOMAIN}` (proxied by `srv-hatchi`)
 - **Deployment**: systemd service on the host
 
@@ -162,7 +169,7 @@ docker stack deploy -c portainer-agent-stack.yml portainer
 
 - Portainer Agent has access to Docker socket (required for management)
 - Consider firewall rules for exposed ports
-- Treat OpenCode like remote shell access and keep basic auth enabled behind TLS
+- Treat OpenCode like remote shell access; if you disable built-in auth, keep it behind trusted network access or another auth layer
 - Use secrets management for sensitive configuration
 
 ## 🔄 Integration with Dokploy
@@ -227,7 +234,7 @@ Since Dokploy runs in Swarm mode:
 - **Service fails at startup**: Check `sudo journalctl -u opencode-web -n 100 --no-pager`
 - **Binary missing**: Verify `/home/dkumlin/.opencode/bin/opencode` exists and is executable
 - **Proxy returns 502**: Confirm `OPENCODE_HOST` in `/opt/homelab/.env` points to `srv-nana` and Caddy was restarted on `srv-hatchi`
-- **Login fails**: Verify `/etc/opencode/opencode-web.env` contains the correct username/password and restart the service
+- **Login fails**: If basic auth is enabled, verify `/etc/opencode/opencode-web.env` contains the correct username/password and restart the service
 
 ## 📚 Additional Resources
 
