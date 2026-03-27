@@ -18,7 +18,7 @@ This setup uses a **hybrid approach**:
 - `docker-compose.yml` - Ollama service configuration (Docker Compose)
 - `opencode-web.env.example` - Example environment file for the OpenCode systemd service
 - `portainer-agent-stack.yml` - Portainer Agent configuration (Docker Swarm Stack)
-- `systemd/opencode-web.service` - OpenCode systemd service unit template
+- `systemd/opencode-web@.service` - OpenCode systemd service template
 - `scripts/install-dokploy.sh` - Dokploy installation script with SELinux support
 
 ## 🚀 Deployment Options
@@ -70,15 +70,17 @@ sudoedit /etc/opencode/opencode-web.env
 2. Install and start the systemd unit:
 
 ```bash
-sudo cp srv-nana/systemd/opencode-web.service /etc/systemd/system/opencode-web.service
+sudo cp srv-nana/systemd/opencode-web@.service /etc/systemd/system/opencode-web@.service
 sudo systemctl daemon-reload
-sudo systemctl enable --now opencode-web.service
+SERVICE_USER=<unix-user>
+sudo systemctl enable --now "opencode-web@${SERVICE_USER}.service"
 ```
 
 3. Verify the local service:
 
 ```bash
-sudo systemctl status opencode-web.service
+SERVICE_USER=<unix-user>
+sudo systemctl status "opencode-web@${SERVICE_USER}.service"
 source /etc/opencode/opencode-web.env
 curl "http://127.0.0.1:${OPENCODE_PORT}/global/health"
 ```
@@ -143,13 +145,15 @@ docker stack deploy -c portainer-agent-stack.yml portainer
 
 ### OpenCode Web
 
-- **Binary**: `/home/dkumlin/.opencode/bin/opencode`
+- **Service user**: chosen by the `opencode-web@<user>.service` instance name
+- **Home directory**: resolved from the service user's passwd entry at runtime
+- **Binary**: `~/.opencode/bin/opencode` for the selected service user
 - **Port**: `4096`
 - **Bind address**: `0.0.0.0`
-- **Working directory**: `/home/dkumlin/Projects`
+- **Working directory**: defaults to `~/Projects`, overridable with `OPENCODE_WORKDIR`
 - **Auth**: Optional HTTP basic auth via `OPENCODE_SERVER_USERNAME` and `OPENCODE_SERVER_PASSWORD`
 - **Public URL**: `https://opencode.${DOMAIN}` (proxied by `srv-hatchi`)
-- **Deployment**: systemd service on the host
+- **Deployment**: templated systemd service on the host
 
 ## 🛠️ Configuration Notes
 
@@ -189,8 +193,8 @@ Since Dokploy runs in Swarm mode:
 2. ✅ **Verify Swarm**: `docker node ls`
 3. ✅ **Check GPU**: `nvidia-smi` (for Ollama)
 4. ✅ **Deploy Ollama**: `cd srv-nana && docker-compose up -d`
-5. ✅ **Install OpenCode**: copy `srv-nana/systemd/opencode-web.service` and `srv-nana/opencode-web.env.example`
-6. ✅ **Start OpenCode**: `sudo systemctl enable --now opencode-web.service`
+5. ✅ **Install OpenCode**: copy `srv-nana/systemd/opencode-web@.service` and `srv-nana/opencode-web.env.example`
+6. ✅ **Start OpenCode**: `SERVICE_USER=<unix-user> && sudo systemctl enable --now "opencode-web@${SERVICE_USER}.service"`
 7. ✅ **Deploy Portainer**: `cd srv-nana && docker stack deploy -c portainer-agent-stack.yml portainer`
 6. ✅ **Access services**:
     - Dokploy UI: `http://localhost:3000`
@@ -231,8 +235,8 @@ Since Dokploy runs in Swarm mode:
 
 ### OpenCode Issues
 
-- **Service fails at startup**: Check `sudo journalctl -u opencode-web -n 100 --no-pager`
-- **Binary missing**: Verify `/home/dkumlin/.opencode/bin/opencode` exists and is executable
+- **Service fails at startup**: Check `SERVICE_USER=<unix-user> && sudo journalctl -u "opencode-web@${SERVICE_USER}" -n 100 --no-pager`
+- **Binary missing**: Verify `~/.opencode/bin/opencode` exists and is executable for the service user
 - **Proxy returns 502**: Confirm `OPENCODE_HOST` in `/opt/homelab/.env` points to `srv-nana` and Caddy was restarted on `srv-hatchi`
 - **Login fails**: If basic auth is enabled, verify `/etc/opencode/opencode-web.env` contains the correct username/password and restart the service
 
