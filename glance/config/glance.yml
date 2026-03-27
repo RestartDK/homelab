@@ -143,6 +143,9 @@ pages:
               - title: Dokploy
                 url: https://dokploy.${DOMAIN}
                 icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/dokploy.svg
+              - title: OpenCode
+                url: https://opencode.${DOMAIN}
+                icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/code-server.svg
               - title: Ollama
                 url: https://ollama.${DOMAIN}
                 icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/ollama.svg
