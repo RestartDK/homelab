@@ -73,8 +73,6 @@ services:
       - NEXTCLOUD_PORT=${NEXTCLOUD_PORT}
       - NEXTCLOUD_DOCKER_PORT=${NEXTCLOUD_DOCKER_PORT}
       - COCKPIT_PORT=${COCKPIT_PORT}
-      - DOKPLOY_HOST=${DOKPLOY_HOST}
-      - DOKPLOY_UI_PORT=${DOKPLOY_UI_PORT}
       - OPENCODE_HOST=${OPENCODE_HOST}
       - OPENCODE_PORT=${OPENCODE_PORT}
       - OLLAMA_HOST=${OLLAMA_HOST}
@@ -87,7 +85,6 @@ services:
       - host.docker.internal:host-gateway
       - ollama:${OLLAMA_HOST}
       - opencode:${OPENCODE_HOST}
-      - dokploy:${DOKPLOY_HOST}
   glance:
     image: glanceapp/glance
     container_name: glance
