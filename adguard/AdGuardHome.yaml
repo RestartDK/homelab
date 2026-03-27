@@ -151,8 +151,6 @@ filtering:
   rewrites:
     - domain: dashboard.chateauducipieres.com
       answer: 192.168.200.70
-    - domain: dokploy.danielkumlin.com
-      answer: 192.168.200.70
     - domain: ollama.chateauducipieres.com
       answer: 192.168.200.70
     - domain: admin.chateauducipieres.com
