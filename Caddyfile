@@ -22,6 +22,14 @@ ollama.{env.DOMAIN} {
 	}
 }
 
+# OpenCode web (remote server)
+opencode.{env.DOMAIN} {
+	reverse_proxy opencode:{env.OPENCODE_PORT}
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+}
+
 # Komga service
 komga.{env.DOMAIN} {
 	reverse_proxy komga:{env.KOMGA_DOCKER_PORT}

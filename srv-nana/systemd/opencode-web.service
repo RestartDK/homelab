@@ -1,0 +1,19 @@
+[Unit]
+Description=OpenCode web interface
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dkumlin
+Group=dkumlin
+WorkingDirectory=/home/dkumlin/Projects
+Environment=HOME=/home/dkumlin
+Environment=BROWSER=/usr/bin/true
+EnvironmentFile=-/etc/opencode/opencode-web.env
+ExecStart=/usr/bin/env bash -lc 'cd "${OPENCODE_WORKDIR:-/home/dkumlin/Projects}" && exec /home/dkumlin/.opencode/bin/opencode web --hostname "${OPENCODE_HOSTNAME:-0.0.0.0}" --port "${OPENCODE_PORT:-4096}" --cors "https://${OPENCODE_SUBDOMAIN:-opencode}.${DOMAIN:-chateauducipieres.com}"'
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
