@@ -141,7 +141,7 @@ pages:
                 url: https://adguard.${DOMAIN}
                 icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/adguard-home.svg
               - title: Dokploy
-                url: https://dokploy.${DOMAIN}
+                url: https://dokploy.danielkumlin.com
                 icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/dokploy.svg
               - title: OpenCode
                 url: https://opencode.${DOMAIN}
