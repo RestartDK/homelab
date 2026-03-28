@@ -6,17 +6,17 @@ dashboard.{env.DOMAIN} {
 	}
 }
 
-# Dokploy UI (remote server)
-dokploy.{env.DOMAIN} {
-	reverse_proxy dokploy:{env.DOKPLOY_UI_PORT}
+# Ollama API (remote server)
+ollama.{env.DOMAIN} {
+	reverse_proxy ollama:{env.OLLAMA_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 	}
 }
 
-# Ollama API (remote server)
-ollama.{env.DOMAIN} {
-	reverse_proxy ollama:{env.OLLAMA_PORT}
+# OpenCode web (remote server)
+opencode.{env.DOMAIN} {
+	reverse_proxy opencode:{env.OPENCODE_PORT}
 	tls {
 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 	}

@@ -1,6 +1,6 @@
 # Homelab Services - srv-nana
 
-This directory contains the configuration for homelab services including Ollama (AI model server) and Portainer Agent (container management).
+This directory contains the configuration for homelab services including Ollama (AI model server), OpenCode (remote coding interface), and Portainer Agent (container management).
 
 > **Note**: This setup is optimized for **Fedora systems** and systems with **SELinux** enabled.
 
@@ -10,12 +10,15 @@ This setup uses a **hybrid approach**:
 
 - **Dokploy**: Runs independently in Docker Swarm mode (deployed via `install-dokploy.sh`)
 - **Ollama**: Runs via Docker Compose (single host)
+- **OpenCode**: Runs as a systemd service on the host and is exposed through `srv-hatchi` Caddy
 - **Portainer Agent**: Runs as a Docker Swarm service to manage everything
 
 ## 📁 Files Overview
 
 - `docker-compose.yml` - Ollama service configuration (Docker Compose)
+- `opencode-web.env.example` - Example environment file for the OpenCode systemd service
 - `portainer-agent-stack.yml` - Portainer Agent configuration (Docker Swarm Stack)
+- `systemd/opencode-web@.service` - OpenCode systemd service template
 - `scripts/install-dokploy.sh` - Dokploy installation script with SELinux support
 
 ## 🚀 Deployment Options
@@ -51,7 +54,58 @@ cd srv-nana
 docker-compose up -d
 ```
 
-### Step 3: Deploy Portainer Agent (Docker Swarm Stack)
+### Step 3: Install OpenCode web as a host service
+
+OpenCode should run directly on `srv-nana` so it has access to local repos, SSH keys, and toolchains.
+
+1. Copy the example env file and set the password:
+
+```bash
+sudo mkdir -p /etc/opencode
+sudo cp srv-nana/opencode-web.env.example /etc/opencode/opencode-web.env
+sudo chmod 600 /etc/opencode/opencode-web.env
+sudoedit /etc/opencode/opencode-web.env
+```
+
+2. Install and start the systemd unit:
+
+```bash
+sudo cp srv-nana/systemd/opencode-web@.service /etc/systemd/system/opencode-web@.service
+sudo systemctl daemon-reload
+SERVICE_USER=<unix-user>
+sudo systemctl enable --now "opencode-web@${SERVICE_USER}.service"
+```
+
+3. Verify the local service:
+
+```bash
+SERVICE_USER=<unix-user>
+sudo systemctl status "opencode-web@${SERVICE_USER}.service"
+source /etc/opencode/opencode-web.env
+curl "http://127.0.0.1:${OPENCODE_PORT}/global/health"
+```
+
+If you also want OpenCode's built-in basic auth, add these optional variables to `/etc/opencode/opencode-web.env` and restart the service:
+
+```bash
+OPENCODE_SERVER_USERNAME=opencode
+OPENCODE_SERVER_PASSWORD=change-me
+```
+
+4. Add the remote proxy settings to `/opt/homelab/.env` on `srv-hatchi`:
+
+```bash
+OPENCODE_HOST=100.91.192.69
+OPENCODE_PORT=4096
+```
+
+5. Once the Caddy config is deployed on `srv-hatchi`, access OpenCode at:
+
+```text
+https://opencode.${DOMAIN}
+```
+
+### Step 4: Deploy Portainer Agent (Docker Swarm Stack)
 
 Deploy Portainer Agent to manage all containers:
 
@@ -89,6 +143,18 @@ docker stack deploy -c portainer-agent-stack.yml portainer
 - **Network**: `agent_network` (overlay)
 - **Deployment**: Docker Swarm Stack
 
+### OpenCode Web
+
+- **Service user**: chosen by the `opencode-web@<user>.service` instance name
+- **Home directory**: resolved from the service user's passwd entry at runtime
+- **Binary**: `~/.opencode/bin/opencode` for the selected service user
+- **Port**: `4096`
+- **Bind address**: `0.0.0.0`
+- **Working directory**: defaults to `~/Projects`, overridable with `OPENCODE_WORKDIR`
+- **Auth**: Optional HTTP basic auth via `OPENCODE_SERVER_USERNAME` and `OPENCODE_SERVER_PASSWORD`
+- **Public URL**: `https://opencode.${DOMAIN}` (proxied by `srv-hatchi`)
+- **Deployment**: templated systemd service on the host
+
 ## 🛠️ Configuration Notes
 
 ### GPU Support
@@ -107,6 +173,7 @@ docker stack deploy -c portainer-agent-stack.yml portainer
 
 - Portainer Agent has access to Docker socket (required for management)
 - Consider firewall rules for exposed ports
+- Treat OpenCode like remote shell access; if you disable built-in auth, keep it behind trusted network access or another auth layer
 - Use secrets management for sensitive configuration
 
 ## 🔄 Integration with Dokploy
@@ -118,6 +185,7 @@ Since Dokploy runs in Swarm mode:
 3. **Unified management** through Portainer web interface
 4. **SELinux policies** ensure proper Docker socket access
 5. **Fedora optimization** with proper file contexts and labels
+6. **Remote coding access** is exposed through `srv-hatchi` Caddy at `opencode.${DOMAIN}`
 
 ## 📝 Quick Start Checklist
 
@@ -125,11 +193,14 @@ Since Dokploy runs in Swarm mode:
 2. ✅ **Verify Swarm**: `docker node ls`
 3. ✅ **Check GPU**: `nvidia-smi` (for Ollama)
 4. ✅ **Deploy Ollama**: `cd srv-nana && docker-compose up -d`
-5. ✅ **Deploy Portainer**: `cd srv-nana && docker stack deploy -c portainer-agent-stack.yml portainer`
+5. ✅ **Install OpenCode**: copy `srv-nana/systemd/opencode-web@.service` and `srv-nana/opencode-web.env.example`
+6. ✅ **Start OpenCode**: `SERVICE_USER=<unix-user> && sudo systemctl enable --now "opencode-web@${SERVICE_USER}.service"`
+7. ✅ **Deploy Portainer**: `cd srv-nana && docker stack deploy -c portainer-agent-stack.yml portainer`
 6. ✅ **Access services**:
-   - Dokploy UI: `http://localhost:3000`
-   - Ollama API: `http://localhost:11434`
-   - Portainer Agent: `http://localhost:9001`
+    - Dokploy UI: `http://localhost:3000`
+    - Ollama API: `http://localhost:11434`
+    - OpenCode Health: `http://localhost:4096/global/health`
+    - Portainer Agent: `http://localhost:9001`
 
 ## 🆘 Common Issues
 
@@ -161,6 +232,13 @@ Since Dokploy runs in Swarm mode:
 - **Installation fails**: Ensure running as root and ports 80/443 are free
 - **Services not starting**: Check SELinux status with `sestatus`
 - **Update issues**: Use `sudo scripts/install-dokploy.sh update`
+
+### OpenCode Issues
+
+- **Service fails at startup**: Check `SERVICE_USER=<unix-user> && sudo journalctl -u "opencode-web@${SERVICE_USER}" -n 100 --no-pager`
+- **Binary missing**: Verify `~/.opencode/bin/opencode` exists and is executable for the service user
+- **Proxy returns 502**: Confirm `OPENCODE_HOST` in `/opt/homelab/.env` points to `srv-nana` and Caddy was restarted on `srv-hatchi`
+- **Login fails**: If basic auth is enabled, verify `/etc/opencode/opencode-web.env` contains the correct username/password and restart the service
 
 ## 📚 Additional Resources
 

@@ -1,0 +1,17 @@
+[Unit]
+Description=OpenCode web interface for %i
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=%i
+Group=%i
+Environment=BROWSER=/usr/bin/true
+EnvironmentFile=-/etc/opencode/opencode-web.env
+ExecStart=/usr/bin/env bash -lc 'HOME_DIR="$(getent passwd "%i" | cut -d: -f6)" && export HOME="$HOME_DIR" && cd "${OPENCODE_WORKDIR:-$HOME/Projects}" && exec "$HOME/.opencode/bin/opencode" web --hostname "${OPENCODE_HOSTNAME:-0.0.0.0}" --port "${OPENCODE_PORT:-4096}" --cors "https://${OPENCODE_SUBDOMAIN:-opencode}.${DOMAIN:-chateauducipieres.com}"'
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

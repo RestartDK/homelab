@@ -151,8 +151,6 @@ filtering:
   rewrites:
     - domain: dashboard.chateauducipieres.com
       answer: 192.168.200.70
-    - domain: dokploy.chateauducipieres.com
-      answer: 192.168.200.70
     - domain: ollama.chateauducipieres.com
       answer: 192.168.200.70
     - domain: admin.chateauducipieres.com
@@ -182,6 +180,8 @@ filtering:
     - domain: couchdb.chateauducipieres.com
       answer: 192.168.200.70
     - domain: grafana.chateauducipieres.com
+      answer: 192.168.200.70
+    - domain: opencode.chateauducipieres.com
       answer: 192.168.200.70
   safe_fs_patterns:
     - /opt/adguardhome/work/userfilters/*
